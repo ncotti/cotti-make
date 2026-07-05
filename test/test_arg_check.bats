@@ -36,7 +36,7 @@ setup_file() {
 
     printf "int main(void) {return 0;}\n" >> "${src_file1}"
 
-    Try to install arm-none-eabi-gcc
+    # Try to install arm-none-eabi-gcc
     if ! command -v arm-none-eabi-gcc &>/dev/null; then
         sudo apt install gcc-arm-none-eabi
     fi
