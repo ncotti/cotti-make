@@ -65,6 +65,7 @@ endif
 # Program used to spawn new terminal windows
 # Some targets of this Makefile require launching a new program and, for that
 # purpose, create a new terminal for the user to see it running.
+# If left blank, then no external display is shown.
 TERMINAL ?= gnome-terminal
 
 #------------------------------------------------------------------------------

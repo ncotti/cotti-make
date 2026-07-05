@@ -10,6 +10,28 @@ setup_file() {
     export PROJECT_DIR="$BATS_TEST_DIRNAME/../examples/asm_project"
     export BUILD_DIR="${PROJECT_DIR}/build"
     export ELF_FILE="${BUILD_DIR}/exe.elf"
+
+    # Try to install arm-none-eabi-gcc and qemu-system-arm
+    if ! command -v arm-none-eabi-gcc &>/dev/null; then
+        sudo apt install -y gcc-arm-none-eabi
+    fi
+
+    if ! command -v qemu-system-arm &>/dev/null; then
+        sudo apt install -y qemu-system-arm
+    fi
+
+    if ! command -v gdb-multiarch &>/dev/null; then
+        sudo apt install -y gdb-multiarch
+    fi
+
+    if ! command -v renode &>/dev/null; then
+        if [ ! -x "/tmp/renode/renode" ]; then
+            mkdir -p /tmp/renode
+            wget -qO- https://github.com/renode/renode/releases/download/v1.16.1/renode-1.16.1.linux-portable.tar.gz | \
+                tar -xz --strip-components=1 -C /tmp/renode/
+        fi
+        export PATH="${PATH}:/tmp/renode"
+    fi
 }
 
 setup() {
@@ -23,7 +45,7 @@ setup() {
 }
 
 teardown() {
-    true
+    run make -C "${PROJECT_DIR}" kill_sim
 }
 
 teardown_file() {
@@ -31,9 +53,6 @@ teardown_file() {
 }
 
 @test "Compilation should succeed" {
-    command -v qemu-system-arm
-    command -v arm-none-eabi-gcc
-
     run make -C "${PROJECT_DIR}" compile
     assert_success
     assert_file_exist "${ELF_FILE}"
@@ -44,57 +63,111 @@ teardown_file() {
     assert_failure
 }
 
-@test "Launching and killing QEMU simulation environment" {
+@test "Launching and killing QEMU simulation environment in a new terminal" {
+    # This test is skipped because it can only be run manually in an
+    # environment with display options, not in the CI
+    skip
     run make -C "${PROJECT_DIR}" sim \
-        SIM="qemu-system-arm"
+        SIM="qemu-system-arm" \
+        TERMINAL="gnome-terminal"
     sleep 2
     assert_success
     assert_file_exists "${BUILD_DIR}/sim.pid"
 
     run make -C "${PROJECT_DIR}" kill_sim \
-        SIM="qemu-system-arm"
+        SIM="qemu-system-arm" \
+        TERMINAL="gnome-terminal"
+    assert_success
+    assert_file_not_exist "${BUILD_DIR}/sim.pid"
+}
+
+@test "Launching and killing QEMU simulation environment as a daemon" {
+    run make -C "${PROJECT_DIR}" sim \
+        SIM="qemu-system-arm" \
+        TERMINAL=""
+    sleep 2
+    assert_success
+    assert_file_exists "${BUILD_DIR}/sim.pid"
+
+    run make -C "${PROJECT_DIR}" kill_sim \
+        SIM="qemu-system-arm" \
+        TERMINAL=""
+    assert_success
+    assert_file_not_exist "${BUILD_DIR}/sim.pid"
+}
+
+@test "Launching and killing QEMU simulation environment" {
+    run make -C "${PROJECT_DIR}" sim \
+        SIM="qemu-system-arm" \
+        TERMINAL=""
+    sleep 2
+    assert_success
+    assert_file_exists "${BUILD_DIR}/sim.pid"
+
+    run make -C "${PROJECT_DIR}" kill_sim \
+        SIM="qemu-system-arm" \
+        TERMINAL=""
     assert_success
     assert_file_not_exist "${BUILD_DIR}/sim.pid"
 }
 
 @test "Running QEMU simulation" {
-    command -v gdb-multiarch
-    command -v qemu-system-arm
-
     run make -C "${PROJECT_DIR}" debug \
         SIM="qemu-system-arm" \
         GDB="gdb-multiarch" \
-        GDBSCRIPT="debug.gdb"
+        GDBSCRIPT="debug.gdb" \
+        TERMINAL=""
     sleep 2
     assert_success
     assert_file_not_exist "${BUILD_DIR}/sim.pid"
     assert_output --partial "Value retrieved from gdb: 12"
 }
 
-@test "Launching and killing Renode simulation environment" {
-    command -v renode
-
+@test "Launching and killing Renode simulation environment in a new terminal" {
+    # This test is skipped because it can only be run manually in an
+    # environment with display options, not in the CI
+    skip
     run make -C "${PROJECT_DIR}" sim \
-        SIM="renode"
-    sleep 2
+        SIM="renode" \
+        SIMFLAGS="resc.resc --disable-gui" \
+        TERMINAL="gnome-terminal"
+    sleep 3
     assert_success
     assert_file_exists "${BUILD_DIR}/sim.pid"
 
     run make -C "${PROJECT_DIR}" kill_sim \
-        SIM="renode"
+        SIM="renode" \
+        SIMFLAGS="resc.resc --disable-gui" \
+        TERMINAL="gnome-terminal"
+    assert_success
+    assert_file_not_exist "${BUILD_DIR}/sim.pid"
+}
+
+@test "Launching and killing Renode simulation environment as a daemon" {
+    run make -C "${PROJECT_DIR}" sim \
+        SIM="renode" \
+        SIMFLAGS="resc.resc --disable-gui" \
+        TERMINAL=""
+    sleep 3
+    assert_success
+    assert_file_exists "${BUILD_DIR}/sim.pid"
+
+    run make -C "${PROJECT_DIR}" kill_sim \
+        SIM="renode" \
+        SIMFLAGS="resc.resc --disable-gui" \
+        TERMINAL=""
     assert_success
     assert_file_not_exist "${BUILD_DIR}/sim.pid"
 }
 
 @test "Running Renode simulation" {
-    command -v gdb-multiarch
-    command -v renode
-
     run make -C "${PROJECT_DIR}" debug \
         SIM="renode" \
+        SIMFLAGS="resc.resc --disable-gui" \
         GDB="gdb-multiarch" \
-        GDBSCRIPT="debug.gdb"
-    sleep 2
+        GDBSCRIPT="debug.gdb" \
+        TERMINAL=""
+    sleep 3
     assert_success
     assert_file_not_exist "${BUILD_DIR}/sim.pid"
     assert_output --partial "Value retrieved from gdb: 12"

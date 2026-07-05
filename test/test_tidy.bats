@@ -14,11 +14,19 @@ setup_file() {
     export BUILD_DIR="${PROJECT_DIR}/build"
     export ELF_FILE="${PROJECT_DIR}/build/c_project_exe.elf"
 
-    command -v bear
-    command -v clang-tidy
-    command -v clang-format
-
     run make -C "${PROJECT_DIR}" clean
+
+    if ! command -v bear &>/dev/null; then
+        sudo apt install -y bear
+    fi
+
+    if ! command -v clang-tidy &>/dev/null; then
+        sudo apt install -y clang-tidy
+    fi
+
+    if ! command -v clang-format &>/dev/null; then
+        sudo apt install -y clang-format
+    fi
 }
 
 setup() {

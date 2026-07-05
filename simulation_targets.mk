@@ -29,12 +29,19 @@ endif
 #------------------------------------------------------------------------------
 .PHONY: sim ## Execute program in simulation environment
 sim: $(ELF) kill_sim
-	printf "$(MSG_SIM)"
-	printf "$(MAGENTA)$(SIM) $(SIMFLAGS) $(EXTRA_SIMFLAGS)$(NC)\n"
-	gnome-terminal -- bash -c "\
-		$(SIM) $(SIMFLAGS) $(EXTRA_SIMFLAGS) |& tee $(SIM_OUTPUT_FILE); \
-		printf '$(MSG_SIM_CLOSING)'; \
-		read -s -t $(SIM_TIMEOUT_TO_EXIT)";
+	if [ -n "$(TERMINAL)" ]; then \
+		printf "$(MSG_SIM_TERMINAL)"; \
+		printf "$(MAGENTA)$(SIM) $(SIMFLAGS) $(EXTRA_SIMFLAGS)$(NC)\n"; \
+		$(TERMINAL) -- bash -c "\
+			$(SIM) $(SIMFLAGS) $(EXTRA_SIMFLAGS) |& tee $(SIM_OUTPUT_FILE); \
+			printf '$(MSG_SIM_CLOSING)'; \
+			read -s -t $(SIM_TIMEOUT_TO_EXIT)"; \
+	else \
+		printf "$(MSG_SIM_DAEMON)"; \
+		printf "$(MAGENTA)$(SIM) $(SIMFLAGS) $(EXTRA_SIMFLAGS)$(NC)\n"; \
+		printf "$(MSG_SIM_OUTPUT)" "$(SIM_OUTPUT_FILE)"; \
+		$(SIM) $(SIMFLAGS) $(EXTRA_SIMFLAGS) &>$(SIM_OUTPUT_FILE) & \
+	fi
 
 .PHONY: kill_sim ## Kills a running simulator instance
 kill_sim:
