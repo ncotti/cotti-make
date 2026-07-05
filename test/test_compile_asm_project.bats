@@ -27,7 +27,7 @@ setup_file() {
     if ! command -v renode &>/dev/null; then
         if [ ! -x "/tmp/renode/renode" ]; then
             wget -qO- https://github.com/renode/renode/releases/download/v1.16.1/renode-1.16.1.linux-portable.tar.gz | \
-                tar x -C /tmp --strip-components=1
+                tar -x --strip-components=1 -C /tmp/renode/
         fi
         export PATH="${PATH}:/tmp/renode"
     fi

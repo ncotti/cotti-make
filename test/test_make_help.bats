@@ -5,7 +5,7 @@
 ## This file tests the "make help" functionality
 
 setup_file() {
-    export MAKE_DIR="$BATS_TEST_DIRNAME/../"
+    export MAKE_DIR="$BATS_TEST_DIRNAME/.."
 }
 
 setup() {
