@@ -45,7 +45,7 @@ setup() {
 }
 
 teardown() {
-    true
+    run make -C "${PROJECT_DIR}" kill_sim
 }
 
 teardown_file() {
@@ -131,7 +131,7 @@ teardown_file() {
         SIM="renode" \
         SIMFLAGS="resc.resc --disable-gui" \
         TERMINAL="gnome-terminal"
-    sleep 2
+    sleep 3
     assert_success
     assert_file_exists "${BUILD_DIR}/sim.pid"
 
@@ -148,7 +148,7 @@ teardown_file() {
         SIM="renode" \
         SIMFLAGS="resc.resc --disable-gui" \
         TERMINAL=""
-    sleep 2
+    sleep 3
     assert_success
     assert_file_exists "${BUILD_DIR}/sim.pid"
 
@@ -167,7 +167,7 @@ teardown_file() {
         GDB="gdb-multiarch" \
         GDBSCRIPT="debug.gdb" \
         TERMINAL=""
-    sleep 2
+    sleep 3
     assert_success
     assert_file_not_exist "${BUILD_DIR}/sim.pid"
     assert_output --partial "Value retrieved from gdb: 12"
