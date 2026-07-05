@@ -119,7 +119,7 @@ If you still have doubts about some of the variables, check out the comments on 
 
 **Found a bug?** Glad to fix it. Open an [issue][issue] containing the steps to replicate it, or open a [Pull Request][pr] with the fix.
 
-You developed an exiting **new feature**, which extends the current functionality, and you would like to be include it in the repo? No problem, open a [Pull Request][pr] and I will review it.
+You developed an exciting **new feature**, which extends the current functionality, and you would like to be include it in the repo? No problem, open a [Pull Request][pr] and I will review it.
 
 <!-- Footnotes -->
 [^1]: Some flags are automatically added for you, so you don't need to worry about them. Examples of those flags are the `-MMD` for creating dependency files or `-Map` to create a memory map of the executable.

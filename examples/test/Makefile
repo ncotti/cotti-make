@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026  Nicolas Gabriel Cotti
+
 SRC_DIRS ?= ../c_project/src ../c_project/src/nested_src
 INC_DIRS ?= ../c_project/inc ../c_project/inc/nested_inc
 
