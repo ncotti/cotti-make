@@ -40,6 +40,10 @@ setup_file() {
     if ! command -v arm-none-eabi-gcc &>/dev/null; then
         sudo apt install gcc-arm-none-eabi
     fi
+
+    if ! command -v gdb &>/dev/null; then
+        sudo apt install gdb
+    fi
 }
 
 setup() {
