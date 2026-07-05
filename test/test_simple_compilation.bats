@@ -18,6 +18,10 @@ int main(void) {
     return 0;
 }
 EOF
+
+    if ! command -v clang &>/dev/null; then
+        sudo apt install -y clang
+    fi
 }
 
 setup() {
@@ -72,8 +76,6 @@ teardown_file() {
 }
 
 @test "Using clang for compilation" {
-    command -v clang
-
     run make -C "${MAKE_DIR}" -f cottimake.mk compile \
         SRC_DIRS="${src_dir}" \
         CC="clang"

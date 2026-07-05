@@ -35,6 +35,11 @@ setup_file() {
     touch "${inc_file1}" "${inc_file2}" "${inc_file3}" "${inc_file4}"
 
     printf "int main(void) {return 0;}\n" >> "${src_file1}"
+
+    # Try to install arm-none-eabi-gcc
+    # if ! command -v arm-none-eabi-gcc &>/dev/null; then
+    #     sudo apt install gcc-arm-none-eabi
+    # fi
 }
 
 setup() {
@@ -206,9 +211,6 @@ teardown_file() {
 }
 
 @test "Correct toolchain, but wrong binutils" {
-    # Install with sudo apt install arm-none-eabi
-    command -v arm-none-eabi-gcc
-
     run make -C "${MAKE_DIR}" -f cottimake.mk compile \
         SRC_DIRS="${src_dir1}" \
         INC_DIRS="${inc_dir1}" \

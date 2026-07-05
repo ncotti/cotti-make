@@ -10,6 +10,23 @@ setup_file() {
     export PROJECT_DIR="$BATS_TEST_DIRNAME/../examples/asm_project"
     export BUILD_DIR="${PROJECT_DIR}/build"
     export ELF_FILE="${BUILD_DIR}/exe.elf"
+
+    # Try to install arm-none-eabi-gcc and qemu-system-arm
+    if ! command -v arm-none-eabi-gcc &>/dev/null; then
+        sudo apt install -y gcc-arm-none-eabi
+    fi
+
+    if ! command -v qemu-system-arm &>/dev/null; then
+        sudo apt install -y qemu-system-arm
+    fi
+
+    if ! command -v gdb-multiarch &>/dev/null; then
+        sudo apt install -y gdb-multiarch
+    fi
+
+    if ! command -v renode &>/dev/null; then
+        sudo apt install -y renode
+    fi
 }
 
 setup() {
@@ -31,9 +48,6 @@ teardown_file() {
 }
 
 @test "Compilation should succeed" {
-    command -v qemu-system-arm
-    command -v arm-none-eabi-gcc
-
     run make -C "${PROJECT_DIR}" compile
     assert_success
     assert_file_exist "${ELF_FILE}"
@@ -58,9 +72,6 @@ teardown_file() {
 }
 
 @test "Running QEMU simulation" {
-    command -v gdb-multiarch
-    command -v qemu-system-arm
-
     run make -C "${PROJECT_DIR}" debug \
         SIM="qemu-system-arm" \
         GDB="gdb-multiarch" \
@@ -72,8 +83,6 @@ teardown_file() {
 }
 
 @test "Launching and killing Renode simulation environment" {
-    command -v renode
-
     run make -C "${PROJECT_DIR}" sim \
         SIM="renode"
     sleep 2
@@ -87,9 +96,6 @@ teardown_file() {
 }
 
 @test "Running Renode simulation" {
-    command -v gdb-multiarch
-    command -v renode
-
     run make -C "${PROJECT_DIR}" debug \
         SIM="renode" \
         GDB="gdb-multiarch" \
