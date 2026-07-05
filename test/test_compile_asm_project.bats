@@ -25,7 +25,12 @@ setup_file() {
     fi
 
     if ! command -v renode &>/dev/null; then
-        sudo apt install -y renode
+        if [ ! -x "/tmp/renode/renode" ]; then
+            sudo apt install -y renode
+            wget -qO- https://github.com/renode/renode/releases/download/v1.16.1/renode-1.16.1.linux-portable.tar.gz | \
+                tar x -C /tmp --strip-components=1
+        fi
+        export PATH="${PATH}:/tmp/renode"
     fi
 }
 
