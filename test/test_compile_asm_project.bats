@@ -89,13 +89,15 @@ teardown_file() {
 
 @test "Launching and killing Renode simulation environment" {
     run make -C "${PROJECT_DIR}" sim \
-        SIM="renode"
+        SIM="renode" \
+        SIMFLAGS="resc.resc --disable-gui"
     sleep 2
     assert_success
     assert_file_exists "${BUILD_DIR}/sim.pid"
 
     run make -C "${PROJECT_DIR}" kill_sim \
-        SIM="renode"
+        SIM="renode" \
+        SIMFLAGS="resc.resc --disable-gui"
     assert_success
     assert_file_not_exist "${BUILD_DIR}/sim.pid"
 }
@@ -103,6 +105,7 @@ teardown_file() {
 @test "Running Renode simulation" {
     run make -C "${PROJECT_DIR}" debug \
         SIM="renode" \
+        SIMFLAGS="resc.resc --disable-gui" \
         GDB="gdb-multiarch" \
         GDBSCRIPT="debug.gdb"
     sleep 2
