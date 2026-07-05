@@ -1,0 +1,25 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026  Nicolas Gabriel Cotti
+
+name: "BATS test"
+description: <
+  Execute all BATS tests in this repo
+on: push
+
+jobs:
+  example_bats_test:
+    runs-on: ubuntu-latest
+    env:
+      # Modify to match your repo requirements
+      REPO_PATH: cotti-make
+      TEST_PATH: test
+    steps:
+      - name: "Checkout project repo"
+        uses: actions/checkout@v5
+        with:
+          path: ${{ env.REPO_PATH }}
+
+      - name: "Call BATS tester"
+        uses: ncotti/cotti-ci/actions/bats_tester@main
+        with:
+          target_dir: "${{ env.REPO_PATH }}/${{ env.TEST_PATH }}"
