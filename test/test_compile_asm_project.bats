@@ -63,15 +63,50 @@ teardown_file() {
     assert_failure
 }
 
-@test "Launching and killing QEMU simulation environment" {
+@test "Launching and killing QEMU simulation environment in a new terminal" {
+    # This test is skipped because it can only be run manually in an
+    # environment with display options, not in the CI
+    skip
     run make -C "${PROJECT_DIR}" sim \
-        SIM="qemu-system-arm"
+        SIM="qemu-system-arm" \
+        TERMINAL="gnome-terminal"
     sleep 2
     assert_success
     assert_file_exists "${BUILD_DIR}/sim.pid"
 
     run make -C "${PROJECT_DIR}" kill_sim \
-        SIM="qemu-system-arm"
+        SIM="qemu-system-arm" \
+        TERMINAL="gnome-terminal"
+    assert_success
+    assert_file_not_exist "${BUILD_DIR}/sim.pid"
+}
+
+@test "Launching and killing QEMU simulation environment as a daemon" {
+    run make -C "${PROJECT_DIR}" sim \
+        SIM="qemu-system-arm" \
+        TERMINAL=""
+    sleep 2
+    assert_success
+    assert_file_exists "${BUILD_DIR}/sim.pid"
+
+    run make -C "${PROJECT_DIR}" kill_sim \
+        SIM="qemu-system-arm" \
+        TERMINAL=""
+    assert_success
+    assert_file_not_exist "${BUILD_DIR}/sim.pid"
+}
+
+@test "Launching and killing QEMU simulation environment" {
+    run make -C "${PROJECT_DIR}" sim \
+        SIM="qemu-system-arm" \
+        TERMINAL=""
+    sleep 2
+    assert_success
+    assert_file_exists "${BUILD_DIR}/sim.pid"
+
+    run make -C "${PROJECT_DIR}" kill_sim \
+        SIM="qemu-system-arm" \
+        TERMINAL=""
     assert_success
     assert_file_not_exist "${BUILD_DIR}/sim.pid"
 }
@@ -80,24 +115,47 @@ teardown_file() {
     run make -C "${PROJECT_DIR}" debug \
         SIM="qemu-system-arm" \
         GDB="gdb-multiarch" \
-        GDBSCRIPT="debug.gdb"
+        GDBSCRIPT="debug.gdb" \
+        TERMINAL=""
     sleep 2
     assert_success
     assert_file_not_exist "${BUILD_DIR}/sim.pid"
     assert_output --partial "Value retrieved from gdb: 12"
 }
 
-@test "Launching and killing Renode simulation environment" {
+@test "Launching and killing Renode simulation environment in a new terminal" {
+    # This test is skipped because it can only be run manually in an
+    # environment with display options, not in the CI
+    skip
     run make -C "${PROJECT_DIR}" sim \
         SIM="renode" \
-        SIMFLAGS="resc.resc --disable-gui"
+        SIMFLAGS="resc.resc --disable-gui" \
+        TERMINAL="gnome-terminal"
     sleep 2
     assert_success
     assert_file_exists "${BUILD_DIR}/sim.pid"
 
     run make -C "${PROJECT_DIR}" kill_sim \
         SIM="renode" \
-        SIMFLAGS="resc.resc --disable-gui"
+        SIMFLAGS="resc.resc --disable-gui" \
+        TERMINAL="gnome-terminal"
+    assert_success
+    assert_file_not_exist "${BUILD_DIR}/sim.pid"
+}
+
+@test "Launching and killing Renode simulation environment as a daemon" {
+    run make -C "${PROJECT_DIR}" sim \
+        SIM="renode" \
+        SIMFLAGS="resc.resc --disable-gui" \
+        TERMINAL=""
+    sleep 2
+    assert_success
+    assert_file_exists "${BUILD_DIR}/sim.pid"
+
+    run make -C "${PROJECT_DIR}" kill_sim \
+        SIM="renode" \
+        SIMFLAGS="resc.resc --disable-gui" \
+        TERMINAL=""
     assert_success
     assert_file_not_exist "${BUILD_DIR}/sim.pid"
 }
@@ -107,7 +165,8 @@ teardown_file() {
         SIM="renode" \
         SIMFLAGS="resc.resc --disable-gui" \
         GDB="gdb-multiarch" \
-        GDBSCRIPT="debug.gdb"
+        GDBSCRIPT="debug.gdb" \
+        TERMINAL=""
     sleep 2
     assert_success
     assert_file_not_exist "${BUILD_DIR}/sim.pid"

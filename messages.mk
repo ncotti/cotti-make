@@ -98,8 +98,16 @@ define MSG_DEBUG
 $(BOLD_MAGENTA)Debugging:$(NC)\n
 endef
 
-define MSG_SIM
+define MSG_SIM_TERMINAL
 $(BOLD_MAGENTA)Running simulation in a new terminal:$(NC)\n
+endef
+
+define MSG_SIM_DAEMON
+$(BOLD_MAGENTA)Running simulation as a daemon in the background:$(NC)\n
+endef
+
+define MSG_SIM_OUTPUT
+$(BOLD_MAGENTA)Simulator output written to: %s$(NC)\n
 endef
 
 define MSG_SIM_CLOSING

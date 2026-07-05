@@ -142,8 +142,10 @@ endif
 
 endif # SIM
 
+ifneq ($(TERMINAL),)
 ifeq ($(shell command -v $(TERMINAL) 2>/dev/null),)
 $(error $(MSG_INVALID_TERMINAL) $(TERMINAL))
+endif
 endif
 
 endif # Compilation targets
