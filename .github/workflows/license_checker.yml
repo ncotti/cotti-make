@@ -14,7 +14,7 @@ jobs:
       REPO_PATH: cotti-make
       LICENSE: "GPL-3.0-or-later"
       COPYRIGHT: "Copyright (C) 2026  Nicolas Gabriel Cotti"
-      EXTENSIONS: ".c .h .yml .sh .bats .mk Makefile"
+      EXTENSIONS: ".c .h .yml .sh .bats .mk Makefile .ld"
     steps:
       - name: "Checkout project repo"
         uses: actions/checkout@v5
