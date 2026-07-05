@@ -44,6 +44,10 @@ setup_file() {
     if ! command -v gdb &>/dev/null; then
         sudo apt install gdb
     fi
+
+    if ! command -v gnome-terminal &>/dev/null; then
+        sudo apt install gnome-terminal
+    fi
 }
 
 setup() {

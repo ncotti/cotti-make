@@ -31,7 +31,7 @@ endif
 sim: $(ELF) kill_sim
 	printf "$(MSG_SIM)"
 	printf "$(MAGENTA)$(SIM) $(SIMFLAGS) $(EXTRA_SIMFLAGS)$(NC)\n"
-	gnome-terminal -- bash -c "\
+	$(TERMINAL) -- bash -c "\
 		$(SIM) $(SIMFLAGS) $(EXTRA_SIMFLAGS) |& tee $(SIM_OUTPUT_FILE); \
 		printf '$(MSG_SIM_CLOSING)'; \
 		read -s -t $(SIM_TIMEOUT_TO_EXIT)";
