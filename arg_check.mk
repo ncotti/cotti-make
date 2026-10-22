@@ -175,7 +175,7 @@ $(error $(MSG_NO_VERILOG_TOOLCHAIN) $(M_YELLOW)$(T_COCOTB)$(M_NC))
 endif
 
 # Only check for surfer if the user wants to see the waveforms
-ifeq ($(filter v_debug v_wave,$(GOALS)),) # surfer
+ifneq ($(filter v_debug v_wave,$(GOALS)),) # surfer
 
 ifeq ($(shell command -v $(T_SURFER) 2>/dev/null),)
 $(error $(MSG_NO_VERILOG_TOOLCHAIN) $(M_YELLOW)$(T_SURFER)$(M_NC))
