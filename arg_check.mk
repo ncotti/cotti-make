@@ -30,12 +30,22 @@ override TEST_INC_DIRS := $(foreach dir,$(TEST_INC_DIRS),\
 override TEST_FRAMEWORK_SRC_DIRS := $(foreach dir,$(TEST_FRAMEWORK_SRC_DIRS),\
     $(if $(findstring ..,$(dir)),$(realpath $(dir)),$(dir)))
 
+override V_SRC_DIRS := $(foreach dir,$(V_SRC_DIRS),\
+    $(if $(findstring ..,$(dir)),$(realpath $(dir)),$(dir)))
+override V_INC_DIRS := $(foreach dir,$(V_INC_DIRS),\
+    $(if $(findstring ..,$(dir)),$(realpath $(dir)),$(dir)))
+override V_TEST_DIRS := $(foreach dir,$(V_TEST_DIRS),\
+    $(if $(findstring ..,$(dir)),$(realpath $(dir)),$(dir)))
+
 # Sort files
 override SRC_DIRS := $(sort $(SRC_DIRS))
 override INC_DIRS := $(sort $(INC_DIRS))
 override TEST_SRC_DIRS := $(sort $(TEST_SRC_DIRS))
 override TEST_INC_DIRS := $(sort $(TEST_INC_DIRS))
 override TEST_FRAMEWORK_SRC_DIRS := $(sort $(TEST_FRAMEWORK_SRC_DIRS))
+override V_SRC_DIRS := $(sort $(V_SRC_DIRS))
+override V_INC_DIRS := $(sort $(V_INC_DIRS))
+override V_TEST_DIRS := $(sort $(V_TEST_DIRS))
 
 #------------------------------------------------------------------------------
 # SRC_DIRS and INC_DIRS checking
@@ -141,6 +151,97 @@ endif
 endif
 
 endif # SIM
+
+# If there is a Verilog top design defined, it is assumed that the
+# verilog-related toolchain must be installed
+ifdef V_TOP
+
+ifeq ($(shell command -v $(T_VERILATOR) 2>/dev/null),)
+$(error $(MSG_NO_VERILOG_TOOLCHAIN) $(M_YELLOW)$(T_VERILATOR)$(M_NC))
+endif
+
+ifeq ($(shell command -v $(T_SURFER) 2>/dev/null),)
+$(error $(MSG_NO_VERILOG_TOOLCHAIN) $(M_YELLOW)$(T_SURFER)$(M_NC))
+endif
+
+ifeq ($(shell command -v $(T_COCOTB) 2>/dev/null),)
+$(error $(MSG_NO_VERILOG_TOOLCHAIN) $(M_YELLOW)$(T_COCOTB)$(M_NC))
+endif
+
+# V_SRC_DIRS must be defined
+ifndef V_SRC_DIRS
+$(error $(MSG_NO_V_SRC_DIRS))
+endif
+
+# V_TEST_DIRS must be defined
+ifndef V_TEST_DIRS
+$(error $(MSG_NO_V_TEST_DIRS))
+endif
+
+# There should not be duplicates in V_SRC_DIRS
+DUPLICATES := $(shell printf "%s\n" $(strip $(V_SRC_DIRS)) | tr ' ' '\n' | sort | uniq -d)
+ifneq ($(strip $(DUPLICATES)),)
+$(error $(MSG_REPEATED_V_SRC_DIRS) $(DUPLICATES))
+endif
+
+# There should not be duplicates in V_INC_DIRS
+DUPLICATES := $(shell printf "%s\n" $(strip $(V_INC_DIRS)) | tr ' ' '\n' | sort | uniq -d)
+ifneq ($(strip $(DUPLICATES)),)
+$(error $(MSG_REPEATED_V_INC_DIRS) $(DUPLICATES))
+endif
+
+# There should not be duplicates in V_TEST_DIRS
+DUPLICATES := $(shell printf "%s\n" $(strip $(V_TEST_DIRS)) | tr ' ' '\n' | sort | uniq -d)
+ifneq ($(strip $(DUPLICATES)),)
+$(error $(MSG_REPEATED_V_TEST_DIRS) $(DUPLICATES))
+endif
+
+# All source directories must exist and be directories
+NOT_DIRS := $(foreach dir, $(V_SRC_DIRS), $(shell [ ! -d $(dir) ] && echo "$(dir)"))
+ifneq ($(strip $(NOT_DIRS)),)
+$(error $(MSG_WRONG_V_SRC_DIRS) $(NOT_DIRS))
+endif
+
+# Source directories must not be empty
+EMPTY_DIRS := $(foreach dir,$(V_SRC_DIRS), \
+  $(shell find "$(dir)" -maxdepth 1 \
+    \( -name "*.v" -o -name "*.sv" \) \
+    -print -quit | grep -q . || echo "$(dir)"))
+ifneq ($(strip $(EMPTY_DIRS)),)
+$(error $(MSG_EMPTY_V_SRC_DIR) $(EMPTY_DIRS))
+endif
+
+# All include directories must exist and be directories
+NOT_DIRS := $(foreach dir, $(V_INC_DIRS), $(shell [ ! -d $(dir) ] && echo "$(dir)"))
+ifneq ($(strip $(NOT_DIRS)),)
+$(error $(MSG_WRONG_V_INC_DIRS) $(NOT_DIRS))
+endif
+
+# Include directories must not be empty
+EMPTY_DIRS := $(foreach dir,$(V_INC_DIRS), \
+  $(shell find "$(dir)" -maxdepth 1 \
+    \( -name "*.svh" \) \
+      -print -quit | grep -q . || echo "$(dir)"))
+ifneq ($(strip $(EMPTY_DIRS)),)
+$(error $(MSG_EMPTY_V_INC_DIR) $(EMPTY_DIRS))
+endif
+
+# All test directories must exist and be directories
+NOT_DIRS := $(foreach dir, $(V_TEST_DIRS), $(shell [ ! -d $(dir) ] && echo "$(dir)"))
+ifneq ($(strip $(NOT_DIRS)),)
+$(error $(MSG_WRONG_V_TEST_DIRS) $(NOT_DIRS))
+endif
+
+# Test directories must not be empty
+EMPTY_DIRS := $(foreach dir,$(V_TEST_DIRS), \
+  $(shell find "$(dir)" -maxdepth 1 \
+    \( -name "*.py" \) \
+      -print -quit | grep -q . || echo "$(dir)"))
+ifneq ($(strip $(EMPTY_DIRS)),)
+$(error $(MSG_EMPTY_V_TEST_DIR) $(EMPTY_DIRS))
+endif
+
+endif # V_TOP
 
 ifneq ($(TERMINAL),)
 ifeq ($(shell command -v $(TERMINAL) 2>/dev/null),)

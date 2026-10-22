@@ -9,3 +9,4 @@ WARNING     := $(YELLOW)\342\232\240$(NC)
 
 EMPTY :=
 SPACE := $(EMPTY) $(EMPTY)
+COMMA := ,

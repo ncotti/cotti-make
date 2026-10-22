@@ -125,6 +125,32 @@ TEST_INC_DIRS ?=
 TEST_FRAMEWORK_SRC_DIRS ?=
 
 #------------------------------------------------------------------------------
+# Verilog variables
+#------------------------------------------------------------------------------
+
+# The name of the toplevel module/entity in your design.
+V_TOP ?= top
+
+# Simulator flags to be included in the compilation (verilator flags)
+V_FLAGS ?=
+
+# White-space separated list of paths where verilog source files are.
+# All files ending with ".sv" or ".v" will be listed as verilog source
+V_SRC_DIRS ?=
+
+# White-space separated list of paths where non-system header files are.
+# All files ending with ".svh" will be listed as header files.
+V_INC_DIRS ?=
+
+# White-space separated list of paths where python testbenches files are.
+# All files ending with ".py" will be listed as testbenches.
+V_TEST_DIRS ?=
+
+# Name of the folder, inside BUILD_DIR, where verilog build artifacts will be
+# generated
+V_BUILD_DIR ?= verilog
+
+#------------------------------------------------------------------------------
 # Extra variables TODO better name?
 #------------------------------------------------------------------------------
 # Name of the folder where all build artifacts will be generated

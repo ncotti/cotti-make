@@ -45,6 +45,10 @@ T_OBJCOPY 	:= $(CROSS_COMPILE)$(OBJCOPY)
 T_AR		:= $(CROSS_COMPILE)$(AR)
 T_GDB		:= $(CROSS_COMPILE)$(GDB)
 
+T_VERILATOR := verilator
+T_SURFER	:= surfer
+T_COCOTB	:= cocotb-config
+
 # GDB flags that are always included, on top of the ones provided by the user
 EXTRA_GDBFLAGS += -q
 ifneq (,$(GDBSCRIPT))
@@ -121,10 +125,10 @@ override LD_LIBRARY_PATH := $(if $(LD_LIBRARY_PATH),$(LIB_DIRS_COLON):$(LD_LIBRA
 .PHONY: help ## Display this message.
 help:
 	grep -E '^\.PHONY:.*## .*$$' $(MAKE_ROOT)/*.mk $(MAKE_ORIGIN) \
-	| sort \
 	| awk 'BEGIN {FS=":|## "}; \
 	       {gsub(/^[ \t]+|[ \t]+$$/, "", $$3); \
-	        printf "$(BOLD_CYAN)%-12s$(NC) %s\n", $$3, $$4}'
+	        printf "$(BOLD_CYAN)%-12s$(NC) %s\n", $$3, $$4}' \
+	| sort
 
 .PHONY: compile ## Compile source files and generate executable
 compile: $(ELF)
@@ -159,8 +163,6 @@ debug: $(ELF)
 	$(T_GDB) $(GDBFLAGS) $(EXTRA_GDBFLAGS) $(ELF)
 	$(MAKE) --no-print-directory kill_sim
 
-include $(MAKE_ROOT)/print_targets.mk
-
 include $(MAKE_ROOT)/info_targets.mk
 
 include $(MAKE_ROOT)/test_targets.mk
@@ -170,6 +172,11 @@ include $(MAKE_ROOT)/simulation_targets.mk
 include $(MAKE_ROOT)/lib_targets.mk
 
 include $(MAKE_ROOT)/tidy_targets.mk
+
+include $(MAKE_ROOT)/verilog.mk
+
+# Keep the print target for last
+include $(MAKE_ROOT)/print_targets.mk
 
 #------------------------------------------------------------------------------
 # Compilation targets
