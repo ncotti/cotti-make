@@ -14,7 +14,7 @@
 V_SRCS := $(foreach dir, $(V_SRC_DIRS), $(wildcard $(dir)/*.v) $(wildcard $(dir)/*.sv))
 
 # Header files
-V_HEADERS := $(foreach dir, $(V_INC_DIRS), $(wildcard $(dir)/*.v) $(wildcard $(dir)/*.sv))
+V_HEADERS := $(foreach dir, $(V_INC_DIRS), $(wildcard $(dir)/*.svh))
 
 # Test files
 V_TESTS := $(foreach dir, $(V_TEST_DIRS), $(wildcard $(dir)/*.py))
@@ -31,7 +31,7 @@ V_TEST_DIRS_COLON := $(subst $(SPACE),:,$(V_TEST_DIRS_COLON))
 V_TEST_DIRS_COLON := $(if $(PYTHONPATH),$(V_TEST_DIRS_COLON):$(PYTHONPATH),$(V_TEST_DIRS_COLON))
 
 # Test dirs with the format -I<dir>, for using directly into verilator
-V_INC_FLAGS := $(addprefix -I,$(V_TEST_DIRS))
+V_INC_FLAGS := $(addprefix -I,$(V_INC_DIRS))
 
 # Arguments passes to the compiler and simulator directly
 V_FLAGS += -Wall -Wpedantic -Wwarn-lint -Wwarn-style \
