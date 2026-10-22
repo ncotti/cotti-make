@@ -52,6 +52,8 @@ override V_TEST_DIRS := $(sort $(V_TEST_DIRS))
 #------------------------------------------------------------------------------
 # Only execute these checks for compilation targets
 ifeq ($(filter help clean,$(GOALS)),)
+# Only execute if not using a Verilog command
+ifeq ($(findstring v_,$(GOALS)),)
 
 # SRC_DIRS must be defined
 ifndef SRC_DIRS
@@ -152,6 +154,14 @@ endif
 
 endif # SIM
 
+ifneq ($(TERMINAL),)
+ifeq ($(shell command -v $(TERMINAL) 2>/dev/null),)
+$(error $(MSG_INVALID_TERMINAL) $(TERMINAL))
+endif
+endif
+
+endif # Verilog targets
+
 # If there is a Verilog top design defined, it is assumed that the
 # verilog-related toolchain must be installed
 ifdef V_TOP
@@ -242,11 +252,5 @@ $(error $(MSG_EMPTY_V_TEST_DIR) $(EMPTY_DIRS))
 endif
 
 endif # V_TOP
-
-ifneq ($(TERMINAL),)
-ifeq ($(shell command -v $(TERMINAL) 2>/dev/null),)
-$(error $(MSG_INVALID_TERMINAL) $(TERMINAL))
-endif
-endif
 
 endif # Compilation targets
