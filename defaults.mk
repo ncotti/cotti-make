@@ -129,7 +129,7 @@ TEST_FRAMEWORK_SRC_DIRS ?=
 #------------------------------------------------------------------------------
 
 # The name of the toplevel module/entity in your design.
-V_TOP ?= top
+V_TOP ?=
 
 # Simulator flags to be included in the compilation (verilator flags)
 V_FLAGS ?=

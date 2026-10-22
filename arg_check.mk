@@ -170,13 +170,18 @@ ifeq ($(shell command -v $(T_VERILATOR) 2>/dev/null),)
 $(error $(MSG_NO_VERILOG_TOOLCHAIN) $(M_YELLOW)$(T_VERILATOR)$(M_NC))
 endif
 
+ifeq ($(shell command -v $(T_COCOTB) 2>/dev/null),)
+$(error $(MSG_NO_VERILOG_TOOLCHAIN) $(M_YELLOW)$(T_COCOTB)$(M_NC))
+endif
+
+# Only check for surfer if the user wants to see the waveforms
+ifeq ($(filter v_debug v_wave,$(GOALS)),) # surfer
+
 ifeq ($(shell command -v $(T_SURFER) 2>/dev/null),)
 $(error $(MSG_NO_VERILOG_TOOLCHAIN) $(M_YELLOW)$(T_SURFER)$(M_NC))
 endif
 
-ifeq ($(shell command -v $(T_COCOTB) 2>/dev/null),)
-$(error $(MSG_NO_VERILOG_TOOLCHAIN) $(M_YELLOW)$(T_COCOTB)$(M_NC))
-endif
+endif # surfer
 
 # V_SRC_DIRS must be defined
 ifndef V_SRC_DIRS
