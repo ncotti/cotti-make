@@ -1,1 +1,4 @@
 build
+tmp
+.venv
+__pycache__

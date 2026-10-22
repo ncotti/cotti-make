@@ -71,6 +71,82 @@ define MSG_DEBUG_NO_G_FLAG
 $(RED)[ERROR #011]$(NC)\nTrying to debug executable file, but missing \"-g\" flag in CFLAGS.\n
 endef
 
+define MSG_NO_VERILOG_TOOLCHAIN
+$(M_RED)[ERROR #012]$(M_NC)
+Verilog top design was defined as $(M_YELLOW)$(V_TOP)$(M_NC),
+but a Verilog simulator / visualizer was not installed:
+endef
+
+define MSG_EMPTY_V_SRC_DIR
+$(M_RED)[ERROR #013]$(M_NC)
+Variable "V_SRC_DIRS" should not have empty directories.
+Empty directories:
+endef
+
+define MSG_EMPTY_V_INC_DIR
+$(M_RED)[ERROR #014]$(M_NC)
+Variable "V_INC_DIRS" should not have empty directories.
+Empty directories:
+endef
+
+define MSG_EMPTY_V_TEST_DIR
+$(M_RED)[ERROR #015]$(M_NC)
+Variable "V_TEST_DIRS" should not have empty directories.
+Empty directories:
+endef
+
+define MSG_REPEATED_V_SRC_DIRS
+$(M_RED)[ERROR #016]$(M_NC)
+Variable "V_SRC_DIRS" should not have repeated directories.
+Repeated directories:
+endef
+
+define MSG_REPEATED_V_INC_DIRS
+$(M_RED)[ERROR #017]$(M_NC)
+Variable "INC_DIRS" should not have repeated directories.
+Repeated directories:
+endef
+
+define MSG_REPEATED_V_TEST_DIRS
+$(M_RED)[ERROR #018]$(M_NC)
+Variable "V_TEST_DIRS" should not have repeated directories.
+Repeated directories:
+endef
+
+define MSG_NO_V_SRC_DIRS
+$(M_RED)[ERROR #019]$(M_NC)
+If "V_TOP" has been defined, then variable
+"V_SRC_DIRS" must be defined.
+V_SRC_DIRS should contain the path to the SystemVerilog
+sources' location
+endef
+
+define MSG_WRONG_V_SRC_DIRS
+$(M_RED)[ERROR #020]$(M_NC)
+Variable "V_SRC_DIRS" must hold valid directories.
+Invalid directories:
+endef
+
+define MSG_WRONG_V_INC_DIRS
+$(M_RED)[ERROR #021]$(M_NC)
+Variable "V_INC_DIRS" must hold valid directories.
+Invalid directories:
+endef
+
+define MSG_WRONG_V_TEST_DIRS
+$(M_RED)[ERROR #022]$(M_NC)
+Variable "V_TEST_DIRS" must hold valid directories.
+Invalid directories:
+endef
+
+define MSG_NO_V_TEST_DIRS
+$(M_RED)[ERROR #023]$(M_NC)
+If "V_TOP" has been defined, then variable
+"V_TEST_DIRS" must be defined.
+V_TEST_DIRS should contain the path to the cocotb Python
+testbenches' location
+endef
+
 #------------------------------------------------------------------------------
 # Info messages
 #------------------------------------------------------------------------------
