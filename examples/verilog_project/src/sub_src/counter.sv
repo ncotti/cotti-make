@@ -4,29 +4,25 @@
 `include "counter.svh"
 
 module counter (
-  input  logic clk,
-  input  logic rst,
-  input  logic ena,
-  input  logic set,
-  input  logic [`COUNTER_WIDTH-1:0] din,
-  output logic [`COUNTER_WIDTH-1:0] count
+    input logic clk,
+    input logic rst,
+    input logic ena,
+    input logic [`COUNTER_WIDTH-1:0] din,
+    output logic [`COUNTER_WIDTH-1:0] count
 );
 
-  timeunit 1ns;
-  timeprecision 1ns;
+    timeunit 1ns; timeprecision 1ns;
 
-  always_ff @(posedge clk) begin
-    if (rst) begin
-      count <= '0;
-    end else begin
-      if (set) begin
-        count <= din;
-      end else if (ena) begin
-        count <= count + 1;
-      end else begin
-        count <= count;
-      end
+    always_ff @(posedge clk) begin
+        if (rst) begin
+            count <= '0;
+        end else begin
+            if (ena) begin
+                count <= count + 1;
+            end else begin
+                count <= count;
+            end
+        end
     end
-  end
 
 endmodule

@@ -76,7 +76,6 @@ async def reset(dut):
     # Set initial values for the signals.
     dut.ena.value = 0
     dut.rst.value = 0
-    dut.set.value = 0
     dut.din.value = 0
 
     # Keep the reset signal high for 3 clock cycles.
@@ -95,9 +94,6 @@ async def test_edge_trigger(dut):
 
     # Load the counter with the value 10.
     dut.din.value = 10
-    dut.set.value = 1
-    await RisingEdge(dut.clk)
-    dut.set.value = 0
 
     # Set the enable so the counter will increment the 'count' signal
     # for the next 20 clock cycles.
@@ -106,36 +102,3 @@ async def test_edge_trigger(dut):
         await RisingEdge(dut.clk)
 # end test_edge_trigger
 
-# test_self_checking
-@cocotb.test
-async def test_self_checking(dut):
-    # Start the clock running concurrently to the main test coroutine.
-    Clock(dut.clk, 10, "ns").start()
-
-    # We are reusing reset() from the previous example.
-    await reset(dut)
-
-    # Load the counter with the value 10.
-    dut.din.value = 10
-    dut.set.value = 1
-    await RisingEdge(dut.clk)
-    dut.set.value = 0
-
-    # Wait for the quiescent state and ensure our register has updated
-    # to the value that was set during the rising edge of the clock.
-    await Timer(1, "ns")
-    # We expect that the value we loaded earlier is what we read
-    # after the next clock edge.
-    assert dut.count.value == 10
-
-    # Set the enable so the counter will increment the 'count' signal
-    # for the next 20 clock cycles.
-    dut.ena.value = 1
-    expected_value = 10
-    for _ in range(20):
-        # On each clock edge we expect that the result increments by 1.
-        expected_value += 1
-        await RisingEdge(dut.clk)
-        await Timer(1, "ns")
-        assert dut.count.value == expected_value
-# end test_self_checking

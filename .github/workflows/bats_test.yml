@@ -30,6 +30,11 @@ jobs:
           sudo apt install verilator
           pip install "cocotb~=2.1"
 
+          mkdir -p "$HOME/renode"
+          wget -qO- https://github.com/renode/renode/releases/download/v1.16.1/renode-1.16.1.linux-portable.tar.gz | \
+              tar -xz --strip-components=1 -C $HOME/renode/
+          fi
+          echo "/$HOME/renode" >> "$GITHUB_PATH"
 
       - name: "Call BATS tester"
         uses: ncotti/cotti-ci/actions/bats_tester@main
