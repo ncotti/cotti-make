@@ -1,0 +1,29 @@
+name: cotti-make-toolchain
+
+services:
+  toolchain:
+    image: ncotti/cotti-make:latest
+
+    # Default user name will be "ubuntu".
+    user: "${UID}:${GID}"
+
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      network: host
+      target: target
+
+    container_name: cotti-make
+
+    volumes:
+      - ${PWD}:/home/ubuntu/workspace
+
+    privileged: true
+    tty: true
+    stdin_open: true
+
+    network_mode: "host"
+
+    working_dir: "/home/ubuntu/workspace"
+
+    command: ["/bin/bash", "--init-file", "/home/ubuntu/workspace/.envrc"]
