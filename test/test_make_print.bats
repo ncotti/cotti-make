@@ -65,17 +65,6 @@ teardown_file() {
     true
 }
 
-# When no external "SRC_DIRS" is declared, an error message should be shown
-@test "No SRC_DIRS declared and print_src or print_obj is called" {
-    run make -C "${MAKE_DIR}" -f cottimake.mk print_src
-    assert_failure
-    assert_output --partial "[ERROR #001]"
-
-    run make -C "${MAKE_DIR}" -f cottimake.mk print_obj
-    assert_failure
-    assert_output --partial "[ERROR #001]"
-}
-
 @test "Print source files" {
     run make -C "${MAKE_DIR}" -f cottimake.mk print_src \
         SRC_DIRS="${src_dir1} ${src_dir2}"

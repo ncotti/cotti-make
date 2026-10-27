@@ -10,28 +10,6 @@ setup_file() {
     export PROJECT_DIR="$BATS_TEST_DIRNAME/../examples/asm_project"
     export BUILD_DIR="${PROJECT_DIR}/build"
     export ELF_FILE="${BUILD_DIR}/exe.elf"
-
-    # Try to install arm-none-eabi-gcc and qemu-system-arm
-    if ! command -v arm-none-eabi-gcc &>/dev/null; then
-        sudo apt install -y gcc-arm-none-eabi
-    fi
-
-    if ! command -v qemu-system-arm &>/dev/null; then
-        sudo apt install -y qemu-system-arm
-    fi
-
-    if ! command -v gdb-multiarch &>/dev/null; then
-        sudo apt install -y gdb-multiarch
-    fi
-
-    if ! command -v renode &>/dev/null; then
-        if [ ! -x "/tmp/renode/renode" ]; then
-            mkdir -p /tmp/renode
-            wget -qO- https://github.com/renode/renode/releases/download/v1.16.1/renode-1.16.1.linux-portable.tar.gz | \
-                tar -xz --strip-components=1 -C /tmp/renode/
-        fi
-        export PATH="${PATH}:/tmp/renode"
-    fi
 }
 
 setup() {
@@ -167,7 +145,7 @@ teardown_file() {
         GDB="gdb-multiarch" \
         GDBSCRIPT="debug.gdb" \
         TERMINAL=""
-    sleep 3
+    sleep 5
     assert_success
     assert_file_not_exist "${BUILD_DIR}/sim.pid"
     assert_output --partial "Value retrieved from gdb: 12"

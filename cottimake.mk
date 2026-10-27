@@ -29,6 +29,7 @@ MAKE_ORIGIN := $(firstword $(MAKEFILE_LIST))
 include $(MAKE_ROOT)/colors.mk
 include $(MAKE_ROOT)/constants.mk
 include $(MAKE_ROOT)/messages.mk
+include $(MAKE_ROOT)/goals.mk
 
 #------------------------------------------------------------------------------
 # Used-defined variables: default values
@@ -45,9 +46,11 @@ T_OBJCOPY 	:= $(CROSS_COMPILE)$(OBJCOPY)
 T_AR		:= $(CROSS_COMPILE)$(AR)
 T_GDB		:= $(CROSS_COMPILE)$(GDB)
 
-T_VERILATOR := verilator
-T_SURFER	:= surfer
+T_V_COMPILER := verilator
+T_WAVEFORM	:= surfer
 T_COCOTB	:= cocotb-config
+T_V_FMT		:= verible-verilog-format
+T_V_LINT	:= verible-verilog-lint
 
 # GDB flags that are always included, on top of the ones provided by the user
 EXTRA_GDBFLAGS += -q
@@ -71,6 +74,9 @@ ifeq ($(T_CC),$(T_AS))
 EXTRA_ASFLAGS += $(EXTRA_CFLAGS)
 endif
 
+# Check that all tools are installed correctly
+include $(MAKE_ROOT)/install_check.mk
+
 # Check if all variables are ok
 include $(MAKE_ROOT)/arg_check.mk
 
@@ -80,6 +86,7 @@ include $(MAKE_ROOT)/arg_check.mk
 # Generated .elf and .bin files
 ELF 		:= $(BUILD_DIR)/$(EXE).elf
 BIN 		:= $(BUILD_DIR)/$(EXE).bin
+HEX			:= $(BUILD_DIR)/$(EXE).hex
 
 # Source files
 C_SRCS := $(foreach dir, $(SRC_DIRS), $(wildcard $(dir)/*.c))
@@ -135,6 +142,9 @@ compile: $(ELF)
 
 .PHONY: bin ## Generate binary file, without ELF headers.
 bin: $(BIN)
+
+.PHONY: hex ## Create a text-based hexadecimal memory file, with 32-bit instructions per line.
+hex: $(HEX)
 
 .PHONY: clean ## Erase contents of build directory.
 clean:
@@ -206,6 +216,11 @@ $(BUILD_DIR)/%_asm.o: %.S $(MISC_DEPS) | $(BUILD_SRC_DIRS)
 $(BIN): $(ELF)
 	printf "$(MSG_BIN)"
 	$(T_OBJCOPY) -O binary $(ELF) $(BIN)
+
+# Copy ELF file into HEX file
+$(HEX): $(BIN)
+	printf "$(MSG_HEX)"
+	od -An -v -tx4 -w4 $(BIN) | tr -d ' ' | tr '[:lower:]' '[:upper:]' > $(HEX)
 
 # Folders
 $(BUILD_SRC_DIRS) $(BUILD_DIR):

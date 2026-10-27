@@ -15,18 +15,6 @@ setup_file() {
     export ELF_FILE="${PROJECT_DIR}/build/c_project_exe.elf"
 
     run make -C "${PROJECT_DIR}" clean
-
-    if ! command -v bear &>/dev/null; then
-        sudo apt install -y bear
-    fi
-
-    if ! command -v clang-tidy &>/dev/null; then
-        sudo apt install -y clang-tidy
-    fi
-
-    if ! command -v clang-format &>/dev/null; then
-        sudo apt install -y clang-format
-    fi
 }
 
 setup() {
