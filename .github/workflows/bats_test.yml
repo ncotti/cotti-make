@@ -33,7 +33,6 @@ jobs:
           mkdir -p "$HOME/renode"
           wget -qO- https://github.com/renode/renode/releases/download/v1.16.1/renode-1.16.1.linux-portable.tar.gz | \
               tar -xz --strip-components=1 -C $HOME/renode/
-          fi
           echo "/$HOME/renode" >> "$GITHUB_PATH"
 
       - name: "Call BATS tester"
