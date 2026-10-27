@@ -22,14 +22,6 @@ jobs:
           path: ${{ env.REPO_PATH }}
           submodules: "true"
 
-      - name: Debug action paths
-        shell: bash
-        run: |
-          echo "action_path=${{ github.action_path }}"
-          pwd
-          ls -la "${{ github.action_path }}"
-          ls -la "${{ github.action_path }}/../../scripts"
-
       - name: "Call BATS tester"
         uses: ncotti/cotti-ci/actions/bats_tester@action-path
         with:
