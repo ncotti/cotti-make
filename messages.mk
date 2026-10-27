@@ -115,7 +115,6 @@ endef
 
 define MSG_NO_V_SRC_DIRS
 $(M_RED)[ERROR #019]$(M_NC)
-If "V_TOP" has been defined, then variable
 "V_SRC_DIRS" must be defined.
 V_SRC_DIRS should contain the path to the SystemVerilog
 sources' location
@@ -141,10 +140,13 @@ endef
 
 define MSG_NO_V_TEST_DIRS
 $(M_RED)[ERROR #023]$(M_NC)
-If "V_TOP" has been defined, then variable
-"V_TEST_DIRS" must be defined.
 V_TEST_DIRS should contain the path to the cocotb Python
 testbenches' location
+endef
+
+define MSG_MISSING_DEPENDENCY
+$(M_RED)[ERROR #024]$(M_NC)
+The following command is required, but it is not installed:
 endef
 
 #------------------------------------------------------------------------------
@@ -220,6 +222,10 @@ endef
 
 define MSG_BIN
 $(MAGENTA)[BIN]    $(NC) $@\n
+endef
+
+define MSG_HEX
+$(MAGENTA)[HEX]    $(NC) $@\n
 endef
 
 define MSG_AR

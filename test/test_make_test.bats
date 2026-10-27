@@ -16,18 +16,6 @@ setup_file() {
     export TEST_FRAMEWORK_SRC_DIRS="${PROJECT_DIR}/../../test/framework/unity/src"
 
     run make -C "${PROJECT_DIR}" clean
-
-    if ! command -v bear &>/dev/null; then
-        sudo apt install -y bear
-    fi
-
-    if ! command -v clang-tidy &>/dev/null; then
-        sudo apt install -y clang-tidy
-    fi
-
-    if ! command -v clang-format &>/dev/null; then
-        sudo apt install -y clang-format
-    fi
 }
 
 setup() {

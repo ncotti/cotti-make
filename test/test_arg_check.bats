@@ -35,19 +35,6 @@ setup_file() {
     touch "${inc_file1}" "${inc_file2}" "${inc_file3}" "${inc_file4}"
 
     printf "int main(void) {return 0;}\n" >> "${src_file1}"
-
-    # Try to install arm-none-eabi-gcc
-    if ! command -v arm-none-eabi-gcc &>/dev/null; then
-        sudo apt install gcc-arm-none-eabi
-    fi
-
-    if ! command -v gdb &>/dev/null; then
-        sudo apt install gdb
-    fi
-
-    if ! command -v gnome-terminal &>/dev/null; then
-        sudo apt install gnome-terminal
-    fi
 }
 
 setup() {
@@ -103,7 +90,7 @@ teardown_file() {
     assert_output --partial "${not_dir1}"
     assert_output --partial "${not_dir2}"
 
-     # Try different combinations of arguments
+    # Try different combinations of arguments
     run make -C "${MAKE_DIR}" -f cottimake.mk compile \
         SRC_DIRS="${not_dir1} ${src_dir1} ${not_dir2} ${src_dir2}"
     assert_failure
@@ -241,7 +228,7 @@ teardown_file() {
 }
 
 @test "If a simulator is specified, it should be installed and be either qemu or renode" {
-    run make -C "${MAKE_DIR}" -f cottimake.mk compile \
+    run make -C "${MAKE_DIR}" -f cottimake.mk sim \
         SRC_DIRS="${src_dir1}" \
         INC_DIRS="${inc_dir1}" \
         SIM="xd"
@@ -251,7 +238,7 @@ teardown_file() {
 
     # gcc is not a valid simulator, but a valid program.
     # It should fail regardless
-    run make -C "${MAKE_DIR}" -f cottimake.mk compile \
+    run make -C "${MAKE_DIR}" -f cottimake.mk sim \
         SRC_DIRS="${src_dir1}" \
         INC_DIRS="${inc_dir1}" \
         SIM="gcc"
@@ -261,9 +248,10 @@ teardown_file() {
 }
 
 @test "Terminal launcher program should exist" {
-    run make -C "${MAKE_DIR}" -f cottimake.mk compile \
+    run make -C "${MAKE_DIR}" -f cottimake.mk sim \
         SRC_DIRS="${src_dir1}" \
         INC_DIRS="${inc_dir1}" \
+        SIM="qemu-system-arm" \
         TERMINAL="xd"
     assert_failure
     assert_output --partial "[ERROR #010]"

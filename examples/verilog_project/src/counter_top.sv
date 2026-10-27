@@ -4,24 +4,19 @@
 `include "counter.svh"
 
 module counter_top (
-  input  logic clk,
-  input  logic rst,
-  input  logic ena,
-  input  logic set,
-  input  logic [`COUNTER_WIDTH-1:0] din,
-  output logic [`COUNTER_WIDTH-1:0] count
+    input logic clk,
+    input logic rst,
+    input logic ena,
+    output logic [`COUNTER_WIDTH-1:0] count
 );
 
-  timeunit 1ns;
-  timeprecision 1ns;
+    timeunit 1ns; timeprecision 1ns;
 
-  counter u_counter (
-    .clk   (clk),
-    .rst   (rst),
-    .ena   (ena),
-    .set   (set),
-    .din   (din),
-    .count (count)
-  );
+    counter u_counter (
+        .clk  (clk),
+        .rst  (rst),
+        .ena  (ena),
+        .count(count)
+    );
 
 endmodule

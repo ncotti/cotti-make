@@ -18,10 +18,6 @@ int main(void) {
     return 0;
 }
 EOF
-
-    if ! command -v clang &>/dev/null; then
-        sudo apt install -y clang
-    fi
 }
 
 setup() {

@@ -7,8 +7,6 @@
 #------------------------------------------------------------------------------
 # Clean-up any "rubbish" from the user input
 #------------------------------------------------------------------------------
-# The goal that was used when calling this Makefile, as "make <goal>"
-GOALS := $(if $(MAKECMDGOALS),$(MAKECMDGOALS),$(.DEFAULT_GOAL))
 
 # Checks will be done on the raw sum of source and include files
 ALL_SRC_DIRS := $(SRC_DIRS) $(TEST_SRC_DIRS) $(TEST_FRAMEWORK_SRC_DIRS)
@@ -48,12 +46,9 @@ override V_INC_DIRS := $(sort $(V_INC_DIRS))
 override V_TEST_DIRS := $(sort $(V_TEST_DIRS))
 
 #------------------------------------------------------------------------------
-# SRC_DIRS and INC_DIRS checking
+# C compilation, simulation or debugging targets
 #------------------------------------------------------------------------------
-# Only execute these checks for compilation targets
-ifeq ($(filter help clean,$(GOALS)),)
-# Only execute if not using a Verilog command
-ifeq ($(findstring v_,$(GOALS)),)
+ifneq ($(filter $(GOALS_C_TOOLCHAIN),$(GOALS)),)
 
 # SRC_DIRS must be defined
 ifndef SRC_DIRS
@@ -102,86 +97,12 @@ ifneq ($(strip $(EMPTY_DIRS)),)
 $(error $(MSG_EMPTY_INC_DIR) $(EMPTY_DIRS))
 endif
 
+endif # GOALS_C_TOOLCHAIN
+
 #------------------------------------------------------------------------------
-# Toolchain verification
+# Verilog compilation or simulation
 #------------------------------------------------------------------------------
-ifeq ($(shell command -v $(T_CC) 2>/dev/null),)
-$(error $(MSG_INVALID_TOOLCHAIN) $(T_CC))
-endif
-
-ifeq ($(shell command -v $(T_AS) 2>/dev/null),)
-$(error $(MSG_INVALID_TOOLCHAIN) $(T_AS))
-endif
-
-ifeq ($(shell command -v $(T_LD) 2>/dev/null),)
-$(error $(MSG_INVALID_TOOLCHAIN) $(T_LD))
-endif
-
-ifeq ($(shell command -v $(T_OBJDUMP) 2>/dev/null),)
-$(error $(MSG_INVALID_TOOLCHAIN) $(T_OBJDUMP))
-endif
-
-ifeq ($(shell command -v $(T_OBJCOPY) 2>/dev/null),)
-$(error $(MSG_INVALID_TOOLCHAIN) $(T_OBJCOPY))
-endif
-
-ifeq ($(shell command -v $(T_AR) 2>/dev/null),)
-$(error $(MSG_INVALID_TOOLCHAIN) $(T_AR))
-endif
-
-# For GDB, the user might have defined "gdb-multiarch", therefore it could
-# not exists inside the toolchain and that would be fine
-ifeq ($(shell command -v $(T_GDB) 2>/dev/null),)
-T_GDB := $(GDB)
-ifeq ($(shell command -v $(T_GDB) 2>/dev/null),)
-$(error $(MSG_INVALID_TOOLCHAIN) $(T_GDB))
-endif
-endif
-
-ifdef SIM
-
-# First, check that the simulator is installed
-ifeq ($(shell command -v $(SIM) 2>/dev/null),)
-$(error $(MSG_INVALID_SIM) $(SIM))
-endif
-
-# Then, check if it is either qemu or renode, won't support any other simulator
-ifeq ($(findstring qemu,$(SIM)),)
-ifeq ($(findstring renode,$(SIM)),)
-$(error $(MSG_INVALID_SIM) $(SIM))
-endif
-endif
-
-endif # SIM
-
-ifneq ($(TERMINAL),)
-ifeq ($(shell command -v $(TERMINAL) 2>/dev/null),)
-$(error $(MSG_INVALID_TERMINAL) $(TERMINAL))
-endif
-endif
-
-endif # Verilog targets
-
-# If there is a Verilog top design defined, it is assumed that the
-# verilog-related toolchain must be installed
-ifdef V_TOP
-
-ifeq ($(shell command -v $(T_VERILATOR) 2>/dev/null),)
-$(error $(MSG_NO_VERILOG_TOOLCHAIN) $(M_YELLOW)$(T_VERILATOR)$(M_NC))
-endif
-
-ifeq ($(shell command -v $(T_COCOTB) 2>/dev/null),)
-$(error $(MSG_NO_VERILOG_TOOLCHAIN) $(M_YELLOW)$(T_COCOTB)$(M_NC))
-endif
-
-# Only check for surfer if the user wants to see the waveforms
-ifneq ($(filter v_debug v_wave,$(GOALS)),) # surfer
-
-ifeq ($(shell command -v $(T_SURFER) 2>/dev/null),)
-$(error $(MSG_NO_VERILOG_TOOLCHAIN) $(M_YELLOW)$(T_SURFER)$(M_NC))
-endif
-
-endif # surfer
+ifneq ($(filter $(GOALS_VERILOG),$(GOALS)),)
 
 # V_SRC_DIRS must be defined
 ifndef V_SRC_DIRS
@@ -191,24 +112,6 @@ endif
 # V_TEST_DIRS must be defined
 ifndef V_TEST_DIRS
 $(error $(MSG_NO_V_TEST_DIRS))
-endif
-
-# There should not be duplicates in V_SRC_DIRS
-DUPLICATES := $(shell printf "%s\n" $(strip $(V_SRC_DIRS)) | tr ' ' '\n' | sort | uniq -d)
-ifneq ($(strip $(DUPLICATES)),)
-$(error $(MSG_REPEATED_V_SRC_DIRS) $(DUPLICATES))
-endif
-
-# There should not be duplicates in V_INC_DIRS
-DUPLICATES := $(shell printf "%s\n" $(strip $(V_INC_DIRS)) | tr ' ' '\n' | sort | uniq -d)
-ifneq ($(strip $(DUPLICATES)),)
-$(error $(MSG_REPEATED_V_INC_DIRS) $(DUPLICATES))
-endif
-
-# There should not be duplicates in V_TEST_DIRS
-DUPLICATES := $(shell printf "%s\n" $(strip $(V_TEST_DIRS)) | tr ' ' '\n' | sort | uniq -d)
-ifneq ($(strip $(DUPLICATES)),)
-$(error $(MSG_REPEATED_V_TEST_DIRS) $(DUPLICATES))
 endif
 
 # All source directories must exist and be directories
@@ -256,6 +159,4 @@ ifneq ($(strip $(EMPTY_DIRS)),)
 $(error $(MSG_EMPTY_V_TEST_DIR) $(EMPTY_DIRS))
 endif
 
-endif # V_TOP
-
-endif # Compilation targets
+endif # GOALS_VERILOG
