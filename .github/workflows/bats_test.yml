@@ -20,6 +20,17 @@ jobs:
           path: ${{ env.REPO_PATH }}
           submodules: "true"
 
+      - name: "Install dependencies"
+        shell: bash
+        run: |
+          sudo apt update
+          sudo apt install gcc-arm-none-eabi gdb gnome-terminal
+          sudo apt install qemu-system-arm gdb-multiarch
+          sudo apt install clang clang-tidy clang-format bear
+          sudo apt install verilator
+          pip install "cocotb~=2.1"
+
+
       - name: "Call BATS tester"
         uses: ncotti/cotti-ci/actions/bats_tester@main
         with:
