@@ -31,6 +31,6 @@ jobs:
           ls -la "${{ github.action_path }}/../../scripts"
 
       - name: "Call BATS tester"
-        uses: ncotti/cotti-ci/actions/bats_tester@main
+        uses: ncotti/cotti-ci/actions/bats_tester@action-path
         with:
           target_dir: "${{ env.REPO_PATH }}/${{ env.TEST_PATH }}"
