@@ -54,7 +54,7 @@ FROM ubuntu:26.04 AS target
     RUN apt-get update \
         && apt-get install -y --no-install-recommends \
             # Essentials
-            make \
+            make git \
             # C-toolchain
             gcc clang clang-tidy clang-format bear \
             # Cross compilation
