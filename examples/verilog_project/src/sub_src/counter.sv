@@ -7,7 +7,6 @@ module counter (
     input logic clk,
     input logic rst,
     input logic ena,
-    input logic [`COUNTER_WIDTH-1:0] din,
     output logic [`COUNTER_WIDTH-1:0] count
 );
 

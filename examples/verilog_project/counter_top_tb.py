@@ -20,25 +20,19 @@ async def test_accessing(dut):
 async def test_getting_values(dut):
     cocotb.log.info("Current clk value is %r", dut.clk.value)
     # Will print `Current clk value is Logic('X')`
-    cocotb.log.info("Current din value is %r", dut.din.value)
-    # Will print `Current din value is LogicArray('XXXXXXXX', Range(7, 'downto', 0))`
 
     dut.clk.value = 1
-    dut.din.value = 124
 # end test_getting_setting_values
 
 # test_waiting
 @cocotb.test
 async def test_waiting(dut):
     dut.clk.value = 1
-    dut.din.value = 124
 
     await Timer(1, "ns")
 
     cocotb.log.info("Current clk value is %r", dut.clk.value)
     # Will print `Current clk value is Logic('1')`
-    cocotb.log.info("Current din value is %r", dut.din.value)
-    # Will print `Current din value is LogicArray('01111100', Range(7, 'downto', 0))`
 # end test_waiting
 
 # test_clock
@@ -76,7 +70,6 @@ async def reset(dut):
     # Set initial values for the signals.
     dut.ena.value = 0
     dut.rst.value = 0
-    dut.din.value = 0
 
     # Keep the reset signal high for 3 clock cycles.
     dut.rst.value = 1
@@ -91,9 +84,6 @@ async def test_edge_trigger(dut):
     Clock(dut.clk, 2, "ns").start()
 
     await reset(dut)
-
-    # Load the counter with the value 10.
-    dut.din.value = 10
 
     # Set the enable so the counter will increment the 'count' signal
     # for the next 20 clock cycles.
