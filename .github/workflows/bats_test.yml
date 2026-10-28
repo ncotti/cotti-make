@@ -7,33 +7,20 @@ description: <
 on: push
 
 jobs:
-  example_bats_test:
+  bats_test:
     runs-on: ubuntu-latest
+    container:
+      image: ncotti/cotti-make:latest
     env:
-      # Modify to match your repo requirements
-      REPO_PATH: cotti-make
-      TEST_PATH: test
+        # Modify to match your repo requirements
+        REPO_PATH: cotti-make
+        TEST_PATH: test
     steps:
       - name: "Checkout project repo"
         uses: actions/checkout@v5
         with:
           path: ${{ env.REPO_PATH }}
           submodules: "true"
-
-      - name: "Install dependencies"
-        shell: bash
-        run: |
-          sudo apt update
-          sudo apt install gcc-arm-none-eabi gdb gnome-terminal
-          sudo apt install qemu-system-arm gdb-multiarch
-          sudo apt install clang clang-tidy clang-format bear
-          sudo apt install verilator
-          pip install "cocotb~=2.1"
-
-          mkdir -p "$HOME/renode"
-          wget -qO- https://github.com/renode/renode/releases/download/v1.16.1/renode-1.16.1.linux-portable.tar.gz | \
-              tar -xz --strip-components=1 -C $HOME/renode/
-          echo "/$HOME/renode" >> "$GITHUB_PATH"
 
       - name: "Call BATS tester"
         uses: ncotti/cotti-ci/actions/bats_tester@main

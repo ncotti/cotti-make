@@ -184,9 +184,8 @@ EOF
 @test "Directories pointing to ../ should be replaced with absolute paths" {
      run make -C "${MAKE_DIR}" -f cottimake.mk print \
         SRC_DIRS="${src_dir1}/../src3" \
-        INC_DIRS="${inc_dir1}/../inc3" \
+        INC_DIRS="${inc_dir1}/../inc3"
     assert_success
-    assert_output --partial "/home"
     assert_output --partial "${src_file5}"
     assert_output --partial "${inc_file5}"
     refute_output --partial ".."
