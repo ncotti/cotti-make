@@ -1,0 +1,24 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026  Nicolas Gabriel Cotti
+
+name: "Bash linter"
+description: <
+  Calls "shellcheck" on all bash script files
+on: push
+
+jobs:
+  bash_linter:
+    runs-on: ubuntu-latest
+    env:
+      REPO_PATH: .
+
+    steps:
+      - name: "Checkout project repo"
+        uses: actions/checkout@v5
+        with:
+          path: ${{ env.REPO_PATH }}
+
+      - name: "Call bash linter"
+        uses: ncotti/cotti-ci/actions/bash_linter@main
+        with:
+          target_dir: "${{ env.REPO_PATH }}"

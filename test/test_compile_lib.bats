@@ -36,7 +36,7 @@ teardown_file() {
 }
 
 @test "Compiling static library" {
-    run make -C ${MAKE_DIR} -f cottimake.mk compile_static_lib \
+    run make -C "${MAKE_DIR}" -f cottimake.mk compile_static_lib \
         SRC_DIRS="${EXT1_SRC_DIRS}" \
         INC_DIRS="${EXT1_INC_DIRS}" \
         BUILD_DIR="${EXT1_BUILD_DIR}" \
@@ -45,7 +45,7 @@ teardown_file() {
     assert_file_exists "${EXT1_BUILD_DIR}/libexternal1.a"
     assert_output --partial "${EXT1_BUILD_DIR}/libexternal1.a"
 
-    run make -C ${MAKE_DIR} -f cottimake.mk compile_static_lib \
+    run make -C "${MAKE_DIR}" -f cottimake.mk compile_static_lib \
         SRC_DIRS="${EXT2_SRC_DIRS}" \
         INC_DIRS="${EXT2_INC_DIRS}" \
         BUILD_DIR="${EXT2_BUILD_DIR}" \
@@ -56,7 +56,7 @@ teardown_file() {
 }
 
 @test "Compiling dynamic library" {
-    run make -C ${MAKE_DIR} -f cottimake.mk compile_dynamic_lib \
+    run make -C "${MAKE_DIR}" -f cottimake.mk compile_dynamic_lib \
         SRC_DIRS="${EXT1_SRC_DIRS}" \
         INC_DIRS="${EXT1_INC_DIRS}" \
         BUILD_DIR="${EXT1_BUILD_DIR}" \
@@ -65,7 +65,7 @@ teardown_file() {
     assert_file_exists "${EXT1_BUILD_DIR}/libexternal1.so"
     assert_output --partial "${EXT1_BUILD_DIR}/libexternal1.so"
 
-    run make -C ${MAKE_DIR} -f cottimake.mk compile_dynamic_lib \
+    run make -C "${MAKE_DIR}" -f cottimake.mk compile_dynamic_lib \
         SRC_DIRS="${EXT2_SRC_DIRS}" \
         INC_DIRS="${EXT2_INC_DIRS}" \
         BUILD_DIR="${EXT2_BUILD_DIR}" \
@@ -77,7 +77,7 @@ teardown_file() {
 
 @test "Executing with static libraries" {
     # First compile external static libraries
-    run make -C ${MAKE_DIR} -f cottimake.mk compile_static_lib \
+    run make -C "${MAKE_DIR}" -f cottimake.mk compile_static_lib \
         SRC_DIRS="${EXT1_SRC_DIRS}" \
         INC_DIRS="${EXT1_INC_DIRS}" \
         BUILD_DIR="${EXT1_BUILD_DIR}" \
@@ -86,7 +86,7 @@ teardown_file() {
     assert_file_exists "${EXT1_BUILD_DIR}/libexternal1.a"
     assert_output --partial "${EXT1_BUILD_DIR}/libexternal1.a"
 
-    run make -C ${MAKE_DIR} -f cottimake.mk compile_static_lib \
+    run make -C "${MAKE_DIR}" -f cottimake.mk compile_static_lib \
         SRC_DIRS="${EXT2_SRC_DIRS}" \
         INC_DIRS="${EXT2_INC_DIRS}" \
         BUILD_DIR="${EXT2_BUILD_DIR}" \
@@ -96,7 +96,7 @@ teardown_file() {
     assert_output --partial "${EXT2_BUILD_DIR}/libexternal2.a"
 
     # Now compile consumer project
-    run make -C ${MAKE_DIR} -f cottimake.mk compile \
+    run make -C "${MAKE_DIR}" -f cottimake.mk compile \
         SRC_DIRS="${CONSUMER_SRC_DIRS}" \
         INC_DIRS="${EXT1_INC_DIRS} ${EXT2_INC_DIRS}" \
         LIB_DIRS="${EXT1_BUILD_DIR} ${EXT2_BUILD_DIR}" \
@@ -108,8 +108,7 @@ teardown_file() {
 
     # Test execution (static libraries do not need to have the
     # library paths defined on execution)
-    export LD_LIBRARY_PATH=""
-    run make -C ${MAKE_DIR} -f cottimake.mk run \
+    LD_LIBRARY_PATH="" run make -C "${MAKE_DIR}" -f cottimake.mk run \
         SRC_DIRS="${CONSUMER_SRC_DIRS}" \
         EXE="consumer" \
         BUILD_DIR="${CONSUMER_BUILD_DIR}"
@@ -122,7 +121,7 @@ teardown_file() {
 
 @test "Executing with dynamic libraries" {
     # First compile external dynamic libraries
-    run make -C ${MAKE_DIR} -f cottimake.mk compile_dynamic_lib \
+    run make -C "${MAKE_DIR}" -f cottimake.mk compile_dynamic_lib \
         SRC_DIRS="${EXT1_SRC_DIRS}" \
         INC_DIRS="${EXT1_INC_DIRS}" \
         BUILD_DIR="${EXT1_BUILD_DIR}" \
@@ -131,7 +130,7 @@ teardown_file() {
     assert_file_exists "${EXT1_BUILD_DIR}/libexternal1.so"
     assert_output --partial "${EXT1_BUILD_DIR}/libexternal1.so"
 
-    run make -C ${MAKE_DIR} -f cottimake.mk compile_dynamic_lib \
+    run make -C "${MAKE_DIR}" -f cottimake.mk compile_dynamic_lib \
         SRC_DIRS="${EXT2_SRC_DIRS}" \
         INC_DIRS="${EXT2_INC_DIRS}" \
         BUILD_DIR="${EXT2_BUILD_DIR}" \
@@ -141,7 +140,7 @@ teardown_file() {
     assert_output --partial "${EXT2_BUILD_DIR}/libexternal2.so"
 
     # Now compile consumer project
-    run make -C ${MAKE_DIR} -f cottimake.mk compile \
+    run make -C "${MAKE_DIR}" -f cottimake.mk compile \
         SRC_DIRS="${CONSUMER_SRC_DIRS}" \
         INC_DIRS="${EXT1_INC_DIRS} ${EXT2_INC_DIRS}" \
         LIB_DIRS="${EXT1_BUILD_DIR} ${EXT2_BUILD_DIR}" \
@@ -153,8 +152,7 @@ teardown_file() {
 
     # Test execution
     # Both library paths are needed
-    export LD_LIBRARY_PATH=""
-    run make -C ${MAKE_DIR} -f cottimake.mk run \
+    LD_LIBRARY_PATH="" run make -C "${MAKE_DIR}" -f cottimake.mk run \
         SRC_DIRS="${CONSUMER_SRC_DIRS}" \
         EXE="consumer" \
         LIB_DIRS="${EXT1_BUILD_DIR} ${EXT2_BUILD_DIR}" \
@@ -168,8 +166,7 @@ teardown_file() {
     refute_output --partial "LD_LIBRARY_PATH=${EXT1_BUILD_DIR}:${EXT2_BUILD_DIR}:"
 
     # Execute again, but now with an extra path in the LD_LIBRARY_PATH
-    export LD_LIBRARY_PATH=/some/random/lib/path
-        run make -C ${MAKE_DIR} -f cottimake.mk run \
+    LD_LIBRARY_PATH=/some/random/lib/path run make -C "${MAKE_DIR}" -f cottimake.mk run \
         SRC_DIRS="${CONSUMER_SRC_DIRS}" \
         EXE="consumer" \
         LIB_DIRS="${EXT1_BUILD_DIR} ${EXT2_BUILD_DIR}" \
@@ -185,7 +182,7 @@ teardown_file() {
 
 @test "Executing with static and dynamic libraries" {
     # Compile static library
-    run make -C ${MAKE_DIR} -f cottimake.mk compile_static_lib \
+    run make -C "${MAKE_DIR}" -f cottimake.mk compile_static_lib \
         SRC_DIRS="${EXT1_SRC_DIRS}" \
         INC_DIRS="${EXT1_INC_DIRS}" \
         BUILD_DIR="${EXT1_BUILD_DIR}" \
@@ -195,7 +192,7 @@ teardown_file() {
     assert_output --partial "${EXT1_BUILD_DIR}/libexternal1.a"
 
     # Compile dynamic library
-    run make -C ${MAKE_DIR} -f cottimake.mk compile_dynamic_lib \
+    run make -C "${MAKE_DIR}" -f cottimake.mk compile_dynamic_lib \
         SRC_DIRS="${EXT2_SRC_DIRS}" \
         INC_DIRS="${EXT2_INC_DIRS}" \
         BUILD_DIR="${EXT2_BUILD_DIR}" \
@@ -205,7 +202,7 @@ teardown_file() {
     assert_output --partial "${EXT2_BUILD_DIR}/libexternal2.so"
 
     # Now compile consumer project
-    run make -C ${MAKE_DIR} -f cottimake.mk compile \
+    run make -C "${MAKE_DIR}" -f cottimake.mk compile \
         SRC_DIRS="${CONSUMER_SRC_DIRS}" \
         INC_DIRS="${EXT1_INC_DIRS} ${EXT2_INC_DIRS}" \
         LIB_DIRS="${EXT1_BUILD_DIR} ${EXT2_BUILD_DIR}" \
@@ -217,8 +214,7 @@ teardown_file() {
 
     # Test execution
     # Only dynamic lib library path is needed
-    export LD_LIBRARY_PATH=""
-    run make -C ${MAKE_DIR} -f cottimake.mk run \
+    LD_LIBRARY_PATH="" run make -C "${MAKE_DIR}" -f cottimake.mk run \
         SRC_DIRS="${CONSUMER_SRC_DIRS}" \
         EXE="consumer" \
         LIB_DIRS="${EXT2_BUILD_DIR}" \
