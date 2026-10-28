@@ -22,7 +22,7 @@ setup() {
 
     # Allow word-splitting to copy the folder's contents
     # shellcheck disable=SC2046
-    cp $(ls $BATS_TEST_DIRNAME/../*.mk) "${COTTI_MAKE_DIR}"
+    cp $(ls "$BATS_TEST_DIRNAME"/../*.mk) "${COTTI_MAKE_DIR}"
 
     export MAKE_DIR="$BATS_TEST_TMPDIR"
     export BUILD_DIR="$BATS_TEST_TMPDIR/build"
