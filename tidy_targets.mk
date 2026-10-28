@@ -21,8 +21,8 @@ tidy: $(COMPILE_COMMANDS)
 		--quiet \
 		$(C_SRCS) $(TEST_SRCS)
 
-.PHONY: format ## Code formatter with clang-format
-format: $(COMPILE_COMMANDS)
+.PHONY: fmt ## Code formatter with clang-format
+fmt: $(COMPILE_COMMANDS)
 	printf "$(MSG_FORMAT)"
 	clang-format \
 		--style="file:$(CLANG_FORMAT_CONFIG_FILE)" \

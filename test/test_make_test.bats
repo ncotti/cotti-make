@@ -62,7 +62,7 @@ teardown_file() {
 }
 
 @test "Test files should be included in the formatter" {
-    run make -C "${PROJECT_DIR}" format
+    run make -C "${PROJECT_DIR}" fmt
     assert_success
     assert_output --partial "[CC]"
     assert_file_exist "${BUILD_DIR}/compile_commands.json"

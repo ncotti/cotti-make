@@ -72,7 +72,7 @@ teardown_file() {
 }
 
 @test "Formatting files should succeed" {
-    run make -C "${PROJECT_DIR}" format
+    run make -C "${PROJECT_DIR}" fmt
     assert_success
     assert_output --partial "[CC]"
     assert_file_exist "${BUILD_DIR}/compile_commands.json"
@@ -84,7 +84,7 @@ teardown_file() {
 
 @test "Using custom .clang-format file" {
     # If you point to a wrong file, it should fail
-    run make -C "${PROJECT_DIR}" format \
+    run make -C "${PROJECT_DIR}" fmt \
         CLANG_FORMAT_CONFIG_FILE="xd"
     assert_failure
     assert_output --partial "Error reading xd: No such file or directory"
