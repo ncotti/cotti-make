@@ -246,3 +246,7 @@ endef
 define MSG_LINK_TEST
 $(MAGENTA)[TEST_LD]$(NC) $@\n
 endef
+
+define MSG_COMPILE_V_FILE
+$(MAGENTA)[SV]     $(NC)
+endef

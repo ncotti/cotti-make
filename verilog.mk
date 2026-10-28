@@ -19,29 +19,27 @@ V_HEADERS := $(foreach dir, $(V_INC_DIRS), $(wildcard $(dir)/*.svh))
 # Test files
 V_TESTS := $(foreach dir, $(V_TEST_DIRS), $(wildcard $(dir)/*.py))
 
-# Test modules, without the .py extension, paths and comma-separated
-# A file like "./test1.py ./test2.py" gets converted to just "test1,test2".
+# Test modules, without the .py extension
 V_TEST_MODULES := $(foreach tb, $(V_TESTS), $(basename $(notdir $(tb))))
 V_TEST_MODULES := $(strip $(V_TEST_MODULES))
 
-# Only keep the test modules that matches the top value
-#V_TEST_MODULES := $(foreach tb,$(V_TEST_MODULES),$(if $(findstring $(V_TOP),$(tb)),$(tb)))
-#V_TEST_MODULES := $(subst $(SPACE),$(COMMA),$(V_TEST_MODULES))
+# Waveform dump filenames
+V_DUMP_FILE := dump.fst
 
 # Test dirs as a colon-separated list
 V_TEST_DIRS_COLON := $(strip $(V_TEST_DIRS))
 V_TEST_DIRS_COLON := $(subst $(SPACE),:,$(V_TEST_DIRS_COLON))
 V_TEST_DIRS_COLON := $(if $(PYTHONPATH),$(V_TEST_DIRS_COLON):$(PYTHONPATH),$(V_TEST_DIRS_COLON))
 
+
 # Test dirs with the format -I<dir>, for using directly into verilator
 V_INC_FLAGS := $(addprefix -I,$(V_INC_DIRS))
-
 
 ## VERILATOR
 # Arguments passes to the compiler and simulator directly
 V_FLAGS += -Wall -Wpedantic -Wwarn-lint -Wwarn-style \
-	--MMD --MP \
-	-sv
+	--MMD --MP -sv \
+	--quiet
 
 # Dump a VCD file for waveform visualization
 V_FLAGS += --trace --trace-fst --trace-structs
@@ -50,8 +48,15 @@ V_FLAGS += --trace --trace-fst --trace-structs
 ## IVERILOG
 #V_FLAGS := -s "$(V_TOP)" -o "$(BUILD_DIR)/$(V_BUILD_DIR)/a.out" -g2012 -Wall
 
-# Waveform dump file
-V_DUMP_FILE := dump.fst
+#------------------------------------------------------------------------------
+# Intermediate variables
+#------------------------------------------------------------------------------
+
+
+
+# This file is created as a "proof of work", showing that the top
+# design has been compiled / linted.
+V_COMPILE_OK_FILE := $(BUILD_DIR)/$(V_BUILD_DIR)/$(V_TOP)/$(V_TOP).txt
 
 #------------------------------------------------------------------------------
 # User targets
@@ -61,11 +66,14 @@ vrun: $(V_SRCS) $(V_HEADERS) $(V_TESTS) $(MISC_DEPS) | $(BUILD_DIR)/$(V_BUILD_DI
 	# This command is allowed to fail, and the waveform file might be
 	# generated regardless
 
+	# TODO, check "regression" target
+
 	for tb in $(V_TEST_MODULES); do \
 		top="$${tb%_tb}"; \
 		mkdir -p "$(BUILD_DIR)/$(V_BUILD_DIR)/$${top}"; \
 		printf "$(BOLD_MAGENTA)[TB] $(NC) $${tb}\n"; \
-		$(MAKE) -f $(shell cocotb-config --makefiles)/Makefile.sim sim \
+		$(MAKE) --no-print-directory --quiet \
+			-f $(shell cocotb-config --makefiles)/Makefile.sim sim \
 			SIM=verilator \
 			WAVES=1 \
 			COCOTB_TOPLEVEL="$${top}" \
@@ -77,16 +85,13 @@ vrun: $(V_SRCS) $(V_HEADERS) $(V_TESTS) $(MISC_DEPS) | $(BUILD_DIR)/$(V_BUILD_DI
 			COCOTB_TEST_MODULES="$${tb}" \
 			PYTHONPATH="$(V_TEST_DIRS_COLON)" \
 			COCOTB_RESULTS_FILE="$(BUILD_DIR)/$(V_BUILD_DIR)/$${top}/results.xml" || true; \
-		if [ -f $(V_DUMP_FILE) ]; then mv $(V_DUMP_FILE) $(BUILD_DIR)/$(V_BUILD_DIR)/$${top}/$(V_DUMP_FILE); fi; \
+		if [ -f $(V_DUMP_FILE) ]; then \
+			mv $(V_DUMP_FILE) $(BUILD_DIR)/$(V_BUILD_DIR)/$${top}/$(V_DUMP_FILE); \
+		fi; \
 	done
 
 .PHONY: vcompile ## Lints and compiles the verilog design.
-vcompile: $(V_SRCS) $(V_HEADERS) $(MISC_DEPS) | $(BUILD_DIR)/$(V_BUILD_DIR)
-	$(T_V_LINT) --check_syntax --lint_fatal --parse_fatal $(V_SRCS)
-	$(T_V_COMPILER) $(V_FLAGS) $(V_INC_FLAGS) \
-		-Mdir "$(BUILD_DIR)/$(V_BUILD_DIR)/$(V_TOP)" \
-		--top $(V_TOP) \
-		--lint-only $(V_SRCS)
+vcompile: $(V_COMPILE_OK_FILE)
 
 .PHONY: vdebug ## Runs cocotb, and also opens the waveform traces.
 vdebug:
@@ -100,10 +105,22 @@ vdebug:
 vfmt:
 	$(T_V_FMT) \
 	--column_limit=80 --indentation_spaces=4 \
-	--inplace $(V_SRCS)
+	--inplace $(V_SRCS) $(V_HEADERS)
+	# TODO format testbenches
 
 #------------------------------------------------------------------------------
 # Auxiliary targets
 #------------------------------------------------------------------------------
 $(BUILD_DIR)/$(V_BUILD_DIR):
 	mkdir -p $@
+
+$(V_COMPILE_OK_FILE): $(V_SRCS) $(V_HEADERS) $(MISC_DEPS) | $(BUILD_DIR)/$(V_BUILD_DIR)
+	printf "$(MSG_COMPILE_V_FILE) $(V_TOP)\n"
+	$(T_V_LINT) --check_syntax --lint_fatal --parse_fatal $(V_SRCS)
+	$(T_V_COMPILER) $(V_FLAGS) $(V_INC_FLAGS) \
+		-Mdir "$(BUILD_DIR)/$(V_BUILD_DIR)/$(V_TOP)" \
+		--top $(V_TOP) \
+		--lint-only $(V_SRCS)
+
+	touch "$(V_COMPILE_OK_FILE)"
+

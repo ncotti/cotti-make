@@ -146,18 +146,22 @@ V_INC_DIRS ?=
 # All files ending with ".py" will be listed as testbenches.
 V_TEST_DIRS ?=
 
-# Name of the folder, inside BUILD_DIR, where verilog build artifacts will be
-# generated
-V_BUILD_DIR ?= verilog
-
 #------------------------------------------------------------------------------
-# Extra variables TODO better name?
+# Auxiliary variables (the user knows what is doing)
 #------------------------------------------------------------------------------
 # Name of the folder where all build artifacts will be generated
 BUILD_DIR ?= build
+
+# Name of the folder, inside BUILD_DIR, where verilog build artifacts will be
+# generated. Files will end up at $(BUILD_DIR)/$(V_BUILD_DIR)/
+V_BUILD_DIR ?= verilog
 
 # Name of the clang-tidy configuration file
 CLANG_TIDY_CONFIG_FILE ?= $(MAKE_ROOT)/.clang-tidy
 
 # Name of the clang-format configuration file
 CLANG_FORMAT_CONFIG_FILE ?= $(MAKE_ROOT)/.clang-format
+
+# If set to any value, then relevant compilation commands will be printed,
+# and all "quiet" flags in other commands will be removed.
+VERBOSE ?=

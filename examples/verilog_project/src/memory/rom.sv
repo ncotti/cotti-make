@@ -1,7 +1,7 @@
 module rom #(
-    int DATA_WIDTH=8,
-    int ADDR_WIDTH=8,
-    string ROM_FILE="rom.hex"
+    int DATA_WIDTH = 8,
+    int ADDR_WIDTH = 8,
+    string ROM_FILE = "rom.hex"
 ) (
     input logic clk,
     input logic [ADDR_WIDTH-1:0] addr,
