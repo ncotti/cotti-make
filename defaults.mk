@@ -152,9 +152,8 @@ V_TEST_DIRS ?=
 # Name of the folder where all build artifacts will be generated
 BUILD_DIR ?= build
 
-# Name of the folder, inside BUILD_DIR, where verilog build artifacts will be
-# generated. Files will end up at $(BUILD_DIR)/$(V_BUILD_DIR)/
-V_BUILD_DIR ?= verilog
+# Name of the folder, where verilog build artifacts will be generated.
+V_BUILD_DIR ?= $(BUILD_DIR)/verilog
 
 # Name of the clang-tidy configuration file
 CLANG_TIDY_CONFIG_FILE ?= $(MAKE_ROOT)/.clang-tidy
