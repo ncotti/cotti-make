@@ -122,7 +122,7 @@ teardown_file() {
 }
 
 @test "Debugging without compiling with -g flag should fail" {
-    run make -C ${PROJECT_DIR} debug \
+    run make -C "${PROJECT_DIR}" debug \
         CFLAGS=""
     assert_failure
     assert_output --partial "[ERROR #011]"
