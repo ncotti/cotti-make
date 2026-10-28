@@ -71,12 +71,6 @@ define MSG_DEBUG_NO_G_FLAG
 $(RED)[ERROR #011]$(NC)\nTrying to debug executable file, but missing \"-g\" flag in CFLAGS.\n
 endef
 
-define MSG_NO_VERILOG_TOOLCHAIN
-$(M_RED)[ERROR #012]$(M_NC)
-Verilog top design was defined as $(M_YELLOW)$(V_TOP)$(M_NC),
-but a Verilog simulator / visualizer was not installed:
-endef
-
 define MSG_EMPTY_V_SRC_DIR
 $(M_RED)[ERROR #013]$(M_NC)
 Variable "V_SRC_DIRS" should not have empty directories.
@@ -141,12 +135,17 @@ endef
 define MSG_NO_V_TEST_DIRS
 $(M_RED)[ERROR #023]$(M_NC)
 V_TEST_DIRS should contain the path to the cocotb Python
-testbenches' location
+testbenches' location.
 endef
 
 define MSG_MISSING_DEPENDENCY
 $(M_RED)[ERROR #024]$(M_NC)
 The following command is required, but it is not installed:
+endef
+
+define MSG_MISSING_V_TOP
+$(M_RED)[ERROR #025]$(M_NC)
+The variable "V_TOP", with the name of the top verilog module, must be defined
 endef
 
 #------------------------------------------------------------------------------

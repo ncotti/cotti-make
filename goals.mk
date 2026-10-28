@@ -18,10 +18,13 @@ GOALS_C_DBG := debug sim
 GOALS_C_LINT := tidy fmt
 
 # Verilog compilation goals
-GOALS_VERILOG := vcompile vdebug vrun vfmt vlint vdebug
+GOALS_VERILOG := vcompile
+
+# Verilog simulation and testbench execution
+GOALS_VERILOG_TB := vrun
 
 # Verilog linting
-GOALS_VERILOG_LINT := vfmt vlint
+GOALS_VERILOG_FMT := vfmt
 
 # Verilog waveforms
 GOALS_WAVEFORM := vdebug

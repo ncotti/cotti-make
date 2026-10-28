@@ -56,7 +56,7 @@ V_DUMP_FILE := dump.fst
 #------------------------------------------------------------------------------
 # User targets
 #------------------------------------------------------------------------------
-.PHONY: vrun ## Runs cocotb on the verilog design.
+.PHONY: vrun ## Runs cocotb testbenches.
 vrun: $(V_SRCS) $(V_HEADERS) $(V_TESTS) $(MISC_DEPS) | $(BUILD_DIR)/$(V_BUILD_DIR)
 	# This command is allowed to fail, and the waveform file might be
 	# generated regardless
@@ -80,9 +80,13 @@ vrun: $(V_SRCS) $(V_HEADERS) $(V_TESTS) $(MISC_DEPS) | $(BUILD_DIR)/$(V_BUILD_DI
 		if [ -f $(V_DUMP_FILE) ]; then mv $(V_DUMP_FILE) $(BUILD_DIR)/$(V_BUILD_DIR)/$${top}/$(V_DUMP_FILE); fi; \
 	done
 
-.PHONY: vcompile ## Lints the verilog design using just verilator.
-vcompile: $(MISC_DEPS) | $(BUILD_DIR)/$(V_BUILD_DIR)
-	$(T_V_COMPILER) $(V_FLAGS) -Mdir "$(BUILD_DIR)/$(V_BUILD_DIR)/$(V_TOP)" --top $(V_TOP) $(V_INC_FLAGS) --lint-only $(V_SRCS)
+.PHONY: vcompile ## Lints and compiles the verilog design.
+vcompile: $(V_SRCS) $(V_HEADERS) $(MISC_DEPS) | $(BUILD_DIR)/$(V_BUILD_DIR)
+	$(T_V_LINT) --check_syntax --lint_fatal --parse_fatal $(V_SRCS)
+	$(T_V_COMPILER) $(V_FLAGS) $(V_INC_FLAGS) \
+		-Mdir "$(BUILD_DIR)/$(V_BUILD_DIR)/$(V_TOP)" \
+		--top $(V_TOP) \
+		--lint-only $(V_SRCS)
 
 .PHONY: vdebug ## Runs cocotb, and also opens the waveform traces.
 vdebug:
@@ -98,14 +102,8 @@ vfmt:
 	--column_limit=80 --indentation_spaces=4 \
 	--inplace $(V_SRCS)
 
-.PHONY: vlint ## Lint SystemVerilog files
-vlint:
-	$(T_V_LINT) --check_syntax --lint_fatal --parse_fatal $(V_SRCS)
-
 #------------------------------------------------------------------------------
 # Auxiliary targets
 #------------------------------------------------------------------------------
 $(BUILD_DIR)/$(V_BUILD_DIR):
 	mkdir -p $@
-
-
