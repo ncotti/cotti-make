@@ -108,7 +108,7 @@ teardown_file() {
 
     # Test execution (static libraries do not need to have the
     # library paths defined on execution)
-    run LD_LIBRARY_PATH="" make -C "${MAKE_DIR}" -f cottimake.mk run \
+    LD_LIBRARY_PATH="" run make -C "${MAKE_DIR}" -f cottimake.mk run \
         SRC_DIRS="${CONSUMER_SRC_DIRS}" \
         EXE="consumer" \
         BUILD_DIR="${CONSUMER_BUILD_DIR}"
@@ -152,7 +152,7 @@ teardown_file() {
 
     # Test execution
     # Both library paths are needed
-    run export LD_LIBRARY_PATH="" make -C "${MAKE_DIR}" -f cottimake.mk run \
+    LD_LIBRARY_PATH="" run make -C "${MAKE_DIR}" -f cottimake.mk run \
         SRC_DIRS="${CONSUMER_SRC_DIRS}" \
         EXE="consumer" \
         LIB_DIRS="${EXT1_BUILD_DIR} ${EXT2_BUILD_DIR}" \
@@ -166,7 +166,7 @@ teardown_file() {
     refute_output --partial "LD_LIBRARY_PATH=${EXT1_BUILD_DIR}:${EXT2_BUILD_DIR}:"
 
     # Execute again, but now with an extra path in the LD_LIBRARY_PATH
-    run LD_LIBRARY_PATH=/some/random/lib/path make -C "${MAKE_DIR}" -f cottimake.mk run \
+    LD_LIBRARY_PATH=/some/random/lib/path run make -C "${MAKE_DIR}" -f cottimake.mk run \
         SRC_DIRS="${CONSUMER_SRC_DIRS}" \
         EXE="consumer" \
         LIB_DIRS="${EXT1_BUILD_DIR} ${EXT2_BUILD_DIR}" \
@@ -214,8 +214,7 @@ teardown_file() {
 
     # Test execution
     # Only dynamic lib library path is needed
-    export LD_LIBRARY_PATH=""
-    run make -C "${MAKE_DIR}" -f cottimake.mk run \
+    LD_LIBRARY_PATH="" run make -C "${MAKE_DIR}" -f cottimake.mk run \
         SRC_DIRS="${CONSUMER_SRC_DIRS}" \
         EXE="consumer" \
         LIB_DIRS="${EXT2_BUILD_DIR}" \
