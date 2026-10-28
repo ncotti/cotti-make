@@ -9,13 +9,13 @@ GOALS := $(if $(MAKECMDGOALS),$(MAKECMDGOALS),$(.DEFAULT_GOAL))
 
 # Goals that require the C-toolchain installed.
 GOALS_C_TOOLCHAIN := bin compile compile_dynamic_lib compile_static_lib \
-	dasm debug format headers hex run sim test tidy
+	dasm debug fmt headers hex run sim test tidy
 
 # Goals that require GDB or simulation.
 GOALS_C_DBG := debug sim
 
 # C language static analyzer or formatter.
-GOALS_C_LINT := tidy format
+GOALS_C_LINT := tidy fmt
 
 # Verilog compilation goals
 GOALS_VERILOG := vcompile vdebug vrun vfmt vlint vdebug
