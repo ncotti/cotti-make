@@ -23,6 +23,6 @@ jobs:
           submodules: "true"
 
       - name: "Call BATS tester"
-        uses: ncotti/cotti-ci/actions/bats_tester@action-path
+        uses: ncotti/cotti-ci/actions/bats_tester@main
         with:
           target_dir: "${{ env.REPO_PATH }}/${{ env.TEST_PATH }}"
