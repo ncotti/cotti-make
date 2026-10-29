@@ -216,3 +216,13 @@ teardown_file() {
     assert_output --partial "${tb_file1}"
     assert_output --partial "${tb_file2}"
 }
+
+@test "Running with V_TB_TOP defined should only run that tb" {
+    run make -C "${MAKE_DIR}" --no-print-directory vrun \
+        V_TB_TOP="top"
+    assert_success
+    assert_output --partial "${src_file1}"
+    assert_output --partial "${src_file2}"
+    assert_output --partial "${tb_file1}"
+    refute_output --partial "${tb_file2}"
+}
