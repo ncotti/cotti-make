@@ -24,7 +24,7 @@ setup() {
     export tb_dir="$BATS_TEST_TMPDIR/tb1"
     export src_file1="${src_dir}/top.sv"
     export src_file2="${src_dir}/help.sv"
-    export inc_file1="${inc_dir}/top_inc.h"
+    export inc_file1="${inc_dir}/top_inc.svh"
     export tb_file1="${tb_dir}/top_tb.py"
     export tb_file2="${tb_dir}/help_tb.py"
     export make_file="$BATS_TEST_TMPDIR/Makefile"
@@ -90,117 +90,129 @@ teardown_file() {
 }
 
 @test "Modifying a source file should trigger a re-compilation" {
-    run make -C "${MAKE_DIR}" --no-print-directory compile
+    run make -C "${MAKE_DIR}" --no-print-directory vcompile
     assert_success
     assert_output --partial "${src_file1}"
     assert_output --partial "${src_file2}"
 
-    run make -C "${MAKE_DIR}" --no-print-directory compile
+    run make -C "${MAKE_DIR}" --no-print-directory vcompile
     assert_success
     refute_output
 
-    # Modifying one source file should only trigger recompilation of that file
-    # and the linker step
-    printf "\n //Extra comment at the end \n" >> "${src_file1}"
-    run make -C "${MAKE_DIR}" --no-print-directory compile
+    # Modifying one source file should trigger recompilation of all files
+    printf "\n//Extra comment at the end\n" >> "${src_file1}"
+    run make -C "${MAKE_DIR}" --no-print-directory vcompile
     assert_success
     assert_output --partial "${src_file1}"
-    assert_output --partial "${exe_file}"
-    refute_output --partial "${src_file2}"
+    assert_output --partial "${src_file2}"
 
-    run make -C "${MAKE_DIR}" --no-print-directory compile
+    run make -C "${MAKE_DIR}" --no-print-directory vcompile
     assert_success
     refute_output
-
-    # Modifying the other source file
-    printf "\n //Extra comment at the end \n" >> "${src_file2}"
-    run make -C "${MAKE_DIR}" --no-print-directory compile
-    assert_success
-    assert_output --partial "${src_file2}"
-    assert_output --partial "${exe_file}"
-    refute_output --partial "${src_file1}"
 }
 
 @test "Modifying a header file should trigger a re-compilation" {
-    run make -C "${MAKE_DIR}" --no-print-directory compile \
-        CFLAGS=""
+    run make -C "${MAKE_DIR}" --no-print-directory  vcompile
     assert_success
     assert_output --partial "${src_file1}"
     assert_output --partial "${src_file2}"
-    assert_output --partial "${exe_file}"
 
-    run make -C "${MAKE_DIR}" --no-print-directory compile \
-        CFLAGS=""
+    run make -C "${MAKE_DIR}" --no-print-directory vcompile
     assert_success
     refute_output
 
-    # Modifying main.h should only trigger a re-compilation of main.c
-    printf "\n //Extra comment at the end \n" >> "${inc_file1}"
-    run make -C "${MAKE_DIR}" --no-print-directory compile \
-        CFLAGS=""
-    assert_success
-    assert_output --partial "${src_file1}"
-    assert_output --partial "${exe_file}"
-    refute_output --partial "${src_file2}"
-
-    run make -C "${MAKE_DIR}" --no-print-directory compile \
-        CFLAGS=""
-    assert_success
-    refute_output
-
-    # Modifying help.h should trigger recompilation of both files
-    printf "\n //Extra comment at the end \n" >> "${inc_file2}"
-    run make -C "${MAKE_DIR}" --no-print-directory compile \
-        CFLAGS=""
+    # Modifying top_inc.svh should trigger a recompilation
+    printf "\n//Extra comment at the end\n" >> "${inc_file1}"
+    run make -C "${MAKE_DIR}" --no-print-directory vcompile
     assert_success
     assert_output --partial "${src_file1}"
     assert_output --partial "${src_file2}"
-    assert_output --partial "${exe_file}"
-}
 
-@test "Modifying the project's Makefile should trigger a re-compilation" {
-    run make -C "${MAKE_DIR}" --no-print-directory compile
-    assert_success
-    assert_output --partial "${src_file1}"
-    assert_output --partial "${src_file2}"
-    assert_output --partial "${exe_file}"
-
-    run make -C "${MAKE_DIR}" --no-print-directory compile
-    assert_success
-    refute_output
-
-    printf "\n# Extra comment at the end \n" >> "${make_file}"
-    run make -C "${MAKE_DIR}" --no-print-directory compile
-    assert_success
-    assert_output --partial "${src_file1}"
-    assert_output --partial "${src_file2}"
-    assert_output --partial "${exe_file}"
-
-    run make -C "${MAKE_DIR}" --no-print-directory compile
+    run make -C "${MAKE_DIR}" --no-print-directory vcompile
     assert_success
     refute_output
 }
 
 @test "Modifying the project's linker script should trigger a re-compilation" {
-    run make -C "${MAKE_DIR}" --no-print-directory compile
+    run make -C "${MAKE_DIR}" --no-print-directory vcompile
     assert_success
     assert_output --partial "${src_file1}"
     assert_output --partial "${src_file2}"
-    assert_output --partial "${exe_file}"
 
-    run make -C "${MAKE_DIR}" --no-print-directory compile
+    run make -C "${MAKE_DIR}" --no-print-directory vcompile
     assert_success
     refute_output
 
-    printf "\n/* Extra comment at the end */\n" >> "${linker_file}"
-    run make -C "${MAKE_DIR}" --no-print-directory compile
+    printf "\n#Extra comment at the end\n" >> "${make_file}"
+    run make -C "${MAKE_DIR}" --no-print-directory vcompile
     assert_success
     assert_output --partial "${src_file1}"
     assert_output --partial "${src_file2}"
-    assert_output --partial "${exe_file}"
 
-    run make -C "${MAKE_DIR}" --no-print-directory compile
+    run make -C "${MAKE_DIR}" --no-print-directory vcompile
     assert_success
     refute_output
 }
 
+@test "Modifying the project's sources or includes should trigger a re-run" {
+    run make -C "${MAKE_DIR}" --no-print-directory vrun
+    assert_success
+    assert_output --partial "${src_file1}"
+    assert_output --partial "${src_file2}"
+    assert_output --partial "${tb_file1}"
+    assert_output --partial "${tb_file2}"
+
+    run make -C "${MAKE_DIR}" --no-print-directory vrun
+    assert_success
+    refute_output
+
+    printf "\n//Extra comment at the end\n" >> "${src_file1}"
+    run make -C "${MAKE_DIR}" --no-print-directory vrun
+    assert_success
+    assert_output --partial "${src_file1}"
+    assert_output --partial "${src_file2}"
+    assert_output --partial "${tb_file1}"
+    assert_output --partial "${tb_file2}"
+}
+
+@test "Modifying the testbench should only make that tb run again" {
+    run make -C "${MAKE_DIR}" --no-print-directory vrun
+    assert_success
+    assert_output --partial "${src_file1}"
+    assert_output --partial "${src_file2}"
+    assert_output --partial "${tb_file1}"
+    assert_output --partial "${tb_file2}"
+
+    run make -C "${MAKE_DIR}" --no-print-directory vrun
+    assert_success
+    refute_output
+
+    printf "\n#Extra comment at the end\n" >> "${tb_file1}"
+    run make -C "${MAKE_DIR}" --no-print-directory vrun
+    assert_success
+    refute_output --partial "${src_file1}"
+    refute_output --partial "${src_file2}"
+    assert_output --partial "${tb_file1}"
+    refute_output --partial "${tb_file2}"
+}
+
+@test "Modifying the Makefile should make all tb run again" {
+    run make -C "${MAKE_DIR}" --no-print-directory vrun
+    assert_success
+    assert_output --partial "${src_file1}"
+    assert_output --partial "${src_file2}"
+    assert_output --partial "${tb_file1}"
+    assert_output --partial "${tb_file2}"
+
+    run make -C "${MAKE_DIR}" --no-print-directory vrun
+    assert_success
+    refute_output
+
+    printf "\n#Extra comment at the end\n" >> "${make_file}"
+    run make -C "${MAKE_DIR}" --no-print-directory vrun
+    assert_success
+    assert_output --partial "${src_file1}"
+    assert_output --partial "${src_file2}"
+    assert_output --partial "${tb_file1}"
+    assert_output --partial "${tb_file2}"
+}

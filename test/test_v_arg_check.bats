@@ -145,3 +145,12 @@ teardown_file() {
     assert_output --partial "[ERROR #015]"
     assert_output --partial "${empty_dir}"
 }
+
+@test "V_TOP_TB must point to a valid tb" {
+    run make -C "${MAKE_DIR}" -f cottimake.mk vrun \
+        V_SRC_DIRS="${src_dir1}" \
+        V_TEST_DIRS="${tb_dir1}" \
+        V_TB_TOP="xd"
+    assert_failure
+    assert_output --partial "[ERROR #025]"
+}

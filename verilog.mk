@@ -106,7 +106,7 @@ $(V_BUILD_DIR)/linter/%_lint_ok.txt: %.sv $(V_SRCS) $(V_HEADERS) $(MISC_DEPS) | 
 	mkdir -p $(dir $@)
 	top=$$(basename "$<" .sv); \
 	top=$$(basename "$${top}" .v); \
-	printf "$(MSG_COMPILE_V_FILE) $${top}\n"; \
+	printf "$(MSG_COMPILE_V_FILE)  $<\n"; \
 	$(T_V_COMPILER) $(V_FLAGS) $(V_INC_FLAGS) \
 		-Mdir "$$(dirname $@)" \
 		--top "$${top}" \
@@ -118,7 +118,7 @@ $(V_BUILD_DIR)/linter/%_lint_ok.txt: %.sv $(V_SRCS) $(V_HEADERS) $(MISC_DEPS) | 
 $(V_BUILD_DIR)/waves/%_dump.fst: %.py $(V_SRCS) $(V_HEADERS) $(MISC_DEPS) | $(V_BUILD_DIR)
 	tb=$$(basename "$<" .py); \
 	top="$${tb%_tb}"; \
-	printf "$(MSG_V_TB) $${tb}\n"; \
+	printf "$(MSG_V_TB) $<\n"; \
 	mkdir -p "$$(dirname $@)"; \
 	$(MAKE) --no-print-directory --quiet \
 		-f $(shell cocotb-config --makefiles)/Makefile.sim sim \
