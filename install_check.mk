@@ -133,6 +133,10 @@ ifeq ($(shell command -v $(T_V_FMT) 2>/dev/null),)
 $(error $(MSG_MISSING_DEPENDENCY) $(T_V_FMT))
 endif
 
+ifeq ($(shell command -v ruff 2>/dev/null),)
+$(error $(MSG_MISSING_DEPENDENCY) ruff)
+endif
+
 endif # GOALS_VERILOG_FMT
 
 #------------------------------------------------------------------------------

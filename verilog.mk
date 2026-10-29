@@ -91,11 +91,10 @@ vdebug: vcompile $(V_WAVEFORMS)
 	$(if $(Q),$(Q)RUST_LOG=warn,) surfer "$(lastword $(^))"
 
 .PHONY: vfmt ## Format SystemVerilog files
-vfmt:
+vfmt: pfmt
 	$(Q)$(T_V_FMT) \
 	--column_limit=80 --indentation_spaces=4 \
 	--inplace $(V_SRCS) $(V_HEADERS)
-	@# TODO format testbenches
 
 #------------------------------------------------------------------------------
 # Auxiliary targets

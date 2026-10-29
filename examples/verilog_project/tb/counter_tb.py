@@ -2,6 +2,7 @@ import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge, Timer
 
+
 async def reset(dut):
     c = Clock(dut.clk, 10, "ns")
     c.start()
@@ -15,6 +16,7 @@ async def reset(dut):
     await RisingEdge(dut.clk)
     dut.rstN.value = 1
     await RisingEdge(dut.clk)
+
 
 @cocotb.test
 async def test_counter_free_running(dut):
@@ -33,6 +35,7 @@ async def test_counter_free_running(dut):
 
     await RisingEdge(dut.clk)
     assert dut.count.value == 32
+
 
 @cocotb.test
 async def test_counter_load(dut):
@@ -60,4 +63,3 @@ async def test_counter_load(dut):
     await Timer(1, "ns")
 
     assert dut.count.value == 0xA1
-

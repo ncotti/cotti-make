@@ -1,0 +1,15 @@
+line-length = 80
+indent-width = 4
+
+[lint]
+
+select = ["ALL"]
+ignore = [
+    "D203",     # Space for first line of docstring
+    "D213",     # First line of docstring on new line
+    "COM812",   # missing-trailing-comma
+]
+
+[format]
+quote-style = "double"
+indent-style = "space"

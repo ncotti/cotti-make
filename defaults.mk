@@ -153,6 +153,14 @@ V_TEST_DIRS ?=
 V_TB_TOP ?=
 
 #------------------------------------------------------------------------------
+# Python variables
+#------------------------------------------------------------------------------
+
+# White-space separated list of paths where Python scripts are.
+# All files ending with ".py" will be listed as Python files.
+PYTHON_SRC_DIRS ?=
+
+#------------------------------------------------------------------------------
 # Auxiliary variables (the user knows what is doing)
 #------------------------------------------------------------------------------
 # Name of the folder where all build artifacts will be generated
@@ -166,6 +174,9 @@ CLANG_TIDY_CONFIG_FILE ?= $(MAKE_ROOT)/.clang-tidy
 
 # Name of the clang-format configuration file
 CLANG_FORMAT_CONFIG_FILE ?= $(MAKE_ROOT)/.clang-format
+
+# Ruff configuration file for Python
+PYTHON_FORMAT_CONFIG_FILE ?= $(MAKE_ROOT)/ruff.toml
 
 # If set to "1" then relevant compilation commands will be printed,
 # and all "quiet" flags in other commands will be removed.
