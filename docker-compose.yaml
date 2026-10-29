@@ -5,7 +5,7 @@ services:
     image: ncotti/cotti-make:latest
 
     # Default user name will be "ubuntu".
-    user: "${UID}:${GID}"
+    user: "${HOST_UID}:${HOST_GID}"
 
     build:
       context: .
