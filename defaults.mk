@@ -128,9 +128,6 @@ TEST_FRAMEWORK_SRC_DIRS ?=
 # Verilog variables
 #------------------------------------------------------------------------------
 
-# The name of the toplevel module/entity in your design.
-V_TOP ?=
-
 # Simulator flags to be included in the compilation (verilator flags)
 V_FLAGS ?=
 
@@ -145,6 +142,13 @@ V_INC_DIRS ?=
 # White-space separated list of paths where python testbenches files are.
 # All files ending with ".py" will be listed as testbenches.
 V_TEST_DIRS ?=
+
+# The name of the "testbench top".
+# If this variable is set, then only this testbench will be run, and also
+# this testbench's waveforms will be displayed.
+# You may specify the name of the module or the name of the testbench, like
+# "top" or "top_tb".
+V_TB_TOP ?=
 
 #------------------------------------------------------------------------------
 # Auxiliary variables (the user knows what is doing)

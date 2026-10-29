@@ -21,11 +21,30 @@ V_HEADERS := $(foreach dir, $(V_INC_DIRS), $(wildcard $(dir)/*.svh))
 # Test files
 V_TESTS := $(foreach dir, $(V_TEST_DIRS), $(wildcard $(dir)/*.py))
 
+ifdef V_TB_TOP
+V_TESTS := $(foreach tb,$(V_TESTS),\
+    $(if $(filter $(V_TB_TOP) $(V_TB_TOP)_tb,$(basename $(notdir $(tb)))),$(tb)))
+
+V_TESTS := $(strip $(V_TESTS))
+
+ifeq ($(V_TESTS),)
+$(error $(MSG_WRONG_V_TB_TOP) $(V_TB_TOP))
+endif
+
+endif # V_TB_TOP
+
 # Waveform files.
 # A waveform is generated for each test, mimicking its path inside the
 # "$(V_BUILD_DIR)/waves" folder.
 V_WAVEFORMS := $(patsubst %.py, %_dump.fst, $(V_TESTS))
-V_WAVEFORMS := $(addprefix $(V_BUILD_DIR)/waves/, $(V_WAVEFORMS))
+V_WAVEFORMS := $(addprefix $(V_BUILD_DIR)/waves/,$(V_WAVEFORMS))
+
+# Lint files
+# This files are created as a "proof of work", showing that the given module
+# was compiled.
+V_LINT_FILES := $(patsubst %.sv, %_lint_ok.txt, $(V_SRCS))
+V_LINT_FILES := $(patsubst %.v, %_lint_ok.txt, $(V_LINT_FILES))
+V_LINT_FILES := $(addprefix $(V_BUILD_DIR)/linter/, $(V_LINT_FILES))
 
 # Test dirs as a colon-separated list
 V_TEST_DIRS_COLON := $(strip $(V_TEST_DIRS))
@@ -51,10 +70,6 @@ V_FLAGS += --trace --trace-fst --trace-structs
 # Intermediate variables
 #------------------------------------------------------------------------------
 
-# This file is created as a "proof of work", showing that the top
-# design has been compiled or linted.
-V_COMPILE_OK_FILE := $(V_BUILD_DIR)/$(V_TOP)/$(V_TOP)_lint_ok.txt
-
 # This is the name of the waveform file generated after running cocotb.
 # Cocotb will always generate the file "dump.fst" in the directory from
 # where it was invoked.
@@ -64,14 +79,15 @@ V_DUMP_FILE := dump.fst
 # User targets
 #------------------------------------------------------------------------------
 .PHONY: vrun ## Runs cocotb testbenches.
-vrun: $(V_WAVEFORMS)
+vrun: vcompile $(V_WAVEFORMS)
 
 .PHONY: vcompile ## Lints and compiles the RTL design.
-vcompile: $(V_COMPILE_OK_FILE)
+vcompile: $(V_LINT_FILES)
+	$(T_V_LINT) --check_syntax --lint_fatal --parse_fatal $(V_SRCS) $(V_HEADERS)
 
 .PHONY: vdebug ## Opens the RTL testbench waveform
-vdebug: $(V_WAVEFORMS)
-	surfer $(V_BUILD_DIR)/$(V_TOP)/$(V_DUMP_FILE); \
+vdebug: vcompile $(V_WAVEFORMS)
+	RUST_LOG=warn surfer "$(lastword $(^))"
 
 .PHONY: vfmt ## Format SystemVerilog files
 vfmt:
@@ -86,21 +102,23 @@ vfmt:
 $(V_BUILD_DIR):
 	mkdir -p $@
 
-$(V_COMPILE_OK_FILE): $(V_SRCS) $(V_HEADERS) $(MISC_DEPS) | $(V_BUILD_DIR)
-	printf "$(MSG_COMPILE_V_FILE) $(V_TOP)\n"
-	$(T_V_LINT) --check_syntax --lint_fatal --parse_fatal $(V_SRCS)
+$(V_BUILD_DIR)/linter/%_lint_ok.txt: %.sv $(V_SRCS) $(V_HEADERS) $(MISC_DEPS) | $(V_BUILD_DIR)
+	mkdir -p $(dir $@)
+	top=$$(basename "$<" .sv); \
+	top=$$(basename "$${top}" .v); \
+	printf "$(MSG_COMPILE_V_FILE) $${top}\n"; \
 	$(T_V_COMPILER) $(V_FLAGS) $(V_INC_FLAGS) \
-		-Mdir "$(V_BUILD_DIR)/$(V_TOP)" \
-		--top $(V_TOP) \
+		-Mdir "$$(dirname $@)" \
+		--top "$${top}" \
 		--lint-only $(V_SRCS)
 
-	touch "$(V_COMPILE_OK_FILE)"
+	touch "$@"
 
 # The simulation might fail, but execution won't be stopped.
-$(V_BUILD_DIR)/waves/%_dump.fst: %.py $(V_SRCS) $(V_HEADERS) $(MISC_DEPS) | $(V_BUILD_DIR)
+$(V_BUILD_DIR)/waves/%_dump.fst: %.py
 	tb=$$(basename "$<" .py); \
 	top="$${tb%_tb}"; \
-	printf "$(BOLD_MAGENTA)[TB] $(NC) $${tb}\n"; \
+	printf "$(MSG_V_TB) $${tb}\n"; \
 	mkdir -p "$$(dirname $@)"; \
 	$(MAKE) --no-print-directory --quiet \
 		-f $(shell cocotb-config --makefiles)/Makefile.sim sim \
@@ -114,7 +132,7 @@ $(V_BUILD_DIR)/waves/%_dump.fst: %.py $(V_SRCS) $(V_HEADERS) $(MISC_DEPS) | $(V_
 		SIM_BUILD="$(V_BUILD_DIR)/$${top}/" \
 		COCOTB_TEST_MODULES="$${tb}" \
 		PYTHONPATH="$(V_TEST_DIRS_COLON)" \
-		COCOTB_RESULTS_FILE="$(V_BUILD_DIR)/$${top}/results.xml" || true; \
+		COCOTB_RESULTS_FILE="$(V_BUILD_DIR)/$${top}/results.xml" || true
 	if [ -f $(V_DUMP_FILE) ]; then \
 		mv "$(V_DUMP_FILE)" "$@"; \
 	fi;

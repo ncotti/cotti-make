@@ -11,7 +11,7 @@ module top #(
     output logic [ADDR_WIDTH-1:0] addr,
     output logic [DATA_WIDTH-1:0] data
 );
-    import top_defines::ROM_FILENAME;
+    import top_defines::RomFilename;
 
     timeunit 1ns; timeprecision 1ns;
 
@@ -27,7 +27,7 @@ module top #(
     rom #(
         .DATA_WIDTH(DATA_WIDTH),
         .ADDR_WIDTH(ADDR_WIDTH),
-        .ROM_FILE  (ROM_FILENAME)
+        .ROM_FILE  (RomFilename)
     ) rom_i (
         .clk (clk),
         .addr(addr),

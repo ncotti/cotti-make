@@ -143,9 +143,10 @@ $(M_RED)[ERROR #024]$(M_NC)
 The following command is required, but it is not installed:
 endef
 
-define MSG_MISSING_V_TOP
+define MSG_WRONG_V_TB_TOP
 $(M_RED)[ERROR #025]$(M_NC)
-The variable "V_TOP", with the name of the top verilog module, must be defined
+The variable "V_TB_TOP", holding the top testbench, was defined, but
+no such testbench was found:
 endef
 
 #------------------------------------------------------------------------------
@@ -249,4 +250,8 @@ endef
 
 define MSG_COMPILE_V_FILE
 $(MAGENTA)[SV]     $(NC)
+endef
+
+define MSG_V_TB
+$(MAGENTA)[TB]     $(NC)
 endef

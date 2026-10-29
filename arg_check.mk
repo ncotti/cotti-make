@@ -103,15 +103,6 @@ endif # GOALS_C_TOOLCHAIN
 # Verilog compilation or formatting
 #------------------------------------------------------------------------------
 
-# Targets that requier the "TOP" to be defined
-ifneq ($(filter $(GOALS_VERILOG) $(GOALS_WAVEFORM),$(GOALS)),)
-
-ifndef V_TOP
-$(error $(MSG_MISSING_V_TOP))
-endif
-
-endif # V_TOP
-
 ifneq ($(filter $(GOALS_VERILOG) $(GOALS_VERILOG_FMT) $(GOALS_WAVEFORM),$(GOALS)),)
 
 # V_SRC_DIRS must be defined
@@ -152,10 +143,10 @@ endif
 endif # GOALS_VERILOG
 
 #------------------------------------------------------------------------------
-# Verilog simulation
+# Verilog simulation and waveform
 #------------------------------------------------------------------------------
 
-ifneq ($(filter $(GOALS_VERILOG_TB),$(GOALS)),)
+ifneq ($(filter $(GOALS_VERILOG_TB) $(GOALS_WAVEFORM),$(GOALS)),)
 
 # V_TEST_DIRS must be defined
 ifndef V_TEST_DIRS
