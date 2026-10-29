@@ -105,27 +105,35 @@ ifeq ($(shell command -v $(T_V_COMPILER) 2>/dev/null),)
 $(error $(MSG_MISSING_DEPENDENCY) $(T_V_COMPILER))
 endif
 
-ifeq ($(shell command -v $(T_COCOTB) 2>/dev/null),)
-$(error $(MSG_MISSING_DEPENDENCY) $(T_COCOTB))
+ifeq ($(shell command -v $(T_V_LINT) 2>/dev/null),)
+$(error $(MSG_MISSING_DEPENDENCY) $(T_V_LINT))
 endif
 
 endif # GOALS_VERILOG
 
 #------------------------------------------------------------------------------
-# Verilog linter
+# Verilog simulatiom
 #------------------------------------------------------------------------------
 
-ifneq ($(filter $(GOALS_VERILOG_LINT),$(GOALS)),)
+ifneq ($(filter $(GOALS_VERILOG_TB),$(GOALS)),)
+
+ifeq ($(shell command -v $(T_COCOTB) 2>/dev/null),)
+$(error $(MSG_MISSING_DEPENDENCY) $(T_COCOTB))
+endif
+
+endif # GOALS_VERILOG_TB
+
+#------------------------------------------------------------------------------
+# Verilog formatter
+#------------------------------------------------------------------------------
+
+ifneq ($(filter $(GOALS_VERILOG_FMT),$(GOALS)),)
 
 ifeq ($(shell command -v $(T_V_FMT) 2>/dev/null),)
 $(error $(MSG_MISSING_DEPENDENCY) $(T_V_FMT))
 endif
 
-ifeq ($(shell command -v $(T_V_LINT) 2>/dev/null),)
-$(error $(MSG_MISSING_DEPENDENCY) $(T_V_LINT))
-endif
-
-endif # GOALS_VERILOG_LINT
+endif # GOALS_VERILOG_FMT
 
 #------------------------------------------------------------------------------
 # Waveform toolchain

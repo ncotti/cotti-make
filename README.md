@@ -2,16 +2,27 @@
 
 A simple to setup, reusable and extendable build system for your C and assembly projects, written entirely with [GNU Make][make].
 
-## Features
+## C Features
 
-* Compile, execute, debug and test your code without having to write Make recipes.
+* Compile, execute, debug and test your C code without having to write Make recipes.
 * Cross-compilation support.
 * Generation of a `compile_commands.json` file, usable with [clangd][clangd] LSP.
 * Formatter and static analysis included with [clang-tidy][clang-tidy] and [clang-format][clang-format].
 * Catches common configuration errors even before attempting to compile or execute the code.
 * Smart re-compilation: knows exactly what files have been modified, and will only recompile what it is absolutely necessary.
 
-## Quick Setup
+See [Quick Setup: C Project](#quick-setup-c-project) to get started.
+
+## Verilog Features
+
+* Lint and compile your SystemVerilog files with [Verilator][verilator].
+* Runt testbenches with [cocotb][cocotb].
+* See waveform with [Surfer][surfer].
+* Smart re-compilation.
+
+See [Quick Setup: Verilog Project](#quick-setup-verilog-project) to get started.
+
+## Quick Setup: C Project
 
 Include this repository as a submodule, or copy all files in its root inside a folder in your project.
 
@@ -21,7 +32,7 @@ Then, create your own `Makefile`, define the variables `SRC_DIRS` and `INC_DIRS`
 SRC_DIRS := src
 INC_DIRS := inc
 
-include cottimake/cottimake.mk
+include cotti-make/cottimake.mk
 ```
 
 And that's all! With that, you can call `make` and easily compile, run your code, and much more!
@@ -33,7 +44,7 @@ If you want to see a demo, go to [examples/c_project][c_project] and try the dif
 
 See the following sections for how to customize the build system to your liking.
 
-## Compilation commands
+### Compilation commands
 
 You can select the tools and the cross-compilation toolchain with the following variables:
 
@@ -57,7 +68,7 @@ EXE ?= <Name of the executable or library to be compiled>
 
 After that, a call to `make compile` or `make run` will trigger the compilation and execution. Also, you can compile libraries with `make compile_static_lib` or `make compile_dynamic_lib`.
 
-## Testing framework
+### Testing framework
 
 As the saying goes:
 > Untested code is broken code
@@ -72,7 +83,7 @@ TEST_INC_DIRS ?= <test_headers>
 TEST_FRAMEWORK_SRC_DIRS ?= <required_srcs_that_are_not_executed>
 ```
 
-## Execution, debugging and simulation
+### Execution, debugging and simulation
 
 **cottiMake** supports three ways of executing your code:
 
@@ -94,6 +105,34 @@ SIMFLAGS ?= <command_line_args_when_running_the_simulator>
 
 Since setting up a simulation environment is not an easy task, the user is encouraged to check out the [examples/asm_project][asm_project], where this mechanism is exercised.
 
+## Quick Setup: Verilog Project
+
+Include this repository as a submodule, or copy all files in its root inside a folder in your project.
+
+Then, create your own `Makefile`, define the variables `V_SRC_DIRS` and `V_INC_DIRS` and `V_TEST_DIRS`,
+containing the paths to the source header and testbenches directories respectively,
+and finally include the file `cottimake.mk`, as shown below:
+
+```make
+V_SRC_DIRS := src
+V_INC_DIRS := inc
+V_TEST_DIRS := tb
+
+include cotti-make/cottimake.mk
+```
+
+And that's all! With that, you can call `make` and easily compile, run your code, and much more!
+
+> [!TIP]
+> The build system is controlled solely by variable definitions processed by `cottimake.mk`, which does the heavy-lifting so you can focus on what really matters: the code.
+
+If you want to see a demo, go to [examples/verilog_project][verilog_project] and try the different `make` commands.
+
+Verilog commands all start with the letter `v`.
+
+You may also define the variable `V_TB_TOP` to run only a single testbench, or to load
+the generated waveform with `make vdebug`.
+
 ## Extending the build system
 
 Need to do something custom that is not support with the default targets? Worry not! You can define new Make targets as you would normally do in any Makefile.
@@ -104,7 +143,7 @@ What's more, by adding a comment with a double numeral `##` after the `.PHONY` d
 SRC_DIRS ?= src
 INC_DIRS ?= inc
 
-include cottimake/cottimake.mk
+include cotti-make/cottimake.mk
 
 .PHONY: custom_target ## This comment will appear in the "make help" menu
 custom_target:
@@ -134,8 +173,12 @@ You developed an exciting **new feature**, which extends the current functionali
 [clangd]: https://clangd.llvm.org/
 [issue]: https://github.com/ncotti/cottiMake/issues
 [pr]: https://github.com/ncotti/cottiMake/pulls
+[verilator]: https://www.veripool.org/verilator/
+[cocotb]: https://www.cocotb.org/
+[surfer]: https://surfer-project.org/
 
 <!-- Internal links -->
 [c_project]: examples/c_project/
 [asm_project]: examples/asm_project/
+[verilog_project]: examples/verilog_project/
 [defaults.mk]: defaults.mk

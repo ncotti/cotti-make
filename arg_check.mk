@@ -100,18 +100,14 @@ endif
 endif # GOALS_C_TOOLCHAIN
 
 #------------------------------------------------------------------------------
-# Verilog compilation or simulation
+# Verilog compilation or formatting
 #------------------------------------------------------------------------------
-ifneq ($(filter $(GOALS_VERILOG),$(GOALS)),)
+
+ifneq ($(filter $(GOALS_VERILOG) $(GOALS_VERILOG_FMT) $(GOALS_WAVEFORM),$(GOALS)),)
 
 # V_SRC_DIRS must be defined
 ifndef V_SRC_DIRS
 $(error $(MSG_NO_V_SRC_DIRS))
-endif
-
-# V_TEST_DIRS must be defined
-ifndef V_TEST_DIRS
-$(error $(MSG_NO_V_TEST_DIRS))
 endif
 
 # All source directories must exist and be directories
@@ -142,6 +138,19 @@ EMPTY_DIRS := $(foreach dir,$(V_INC_DIRS), \
       -print -quit | grep -q . || echo "$(dir)"))
 ifneq ($(strip $(EMPTY_DIRS)),)
 $(error $(MSG_EMPTY_V_INC_DIR) $(EMPTY_DIRS))
+endif
+
+endif # GOALS_VERILOG
+
+#------------------------------------------------------------------------------
+# Verilog simulation and waveform
+#------------------------------------------------------------------------------
+
+ifneq ($(filter $(GOALS_VERILOG_TB) $(GOALS_WAVEFORM),$(GOALS)),)
+
+# V_TEST_DIRS must be defined
+ifndef V_TEST_DIRS
+$(error $(MSG_NO_V_TEST_DIRS))
 endif
 
 # All test directories must exist and be directories

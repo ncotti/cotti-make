@@ -36,7 +36,7 @@ print: print_src print_obj print_header
 
 .PHONY: vprint_src ## Print Verilog design files
 vprint_src:
-	printf "$(BOLD_MAGENTA)Verilog Source files:$(NC)\n"
+	printf "$(BOLD_MAGENTA)SystemVerilog source files:$(NC)\n"
 	for src in $(V_SRCS); do \
 		printf "$${src}\n"; \
 	done
@@ -52,7 +52,7 @@ vprint_tb:
 
 .PHONY: vprint_header ## Print Verilog header files
 vprint_header:
-	printf "$(BOLD_MAGENTA)Verilog header files:$(NC)\n"
+	printf "$(BOLD_MAGENTA)SystemVerilog header files:$(NC)\n"
 	for header in $(V_HEADERS); do \
 		printf "$${header}\n"; \
 	done

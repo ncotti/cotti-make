@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright (C) 2026  Nicolas Gabriel Cotti
 
-## This file tests the usage of verilator + cocotb + surfer for
+## This file tests the usage of verilator + cocotb for
 ## SystemVerilog designs.
 
 setup_file() {
@@ -31,19 +31,16 @@ teardown_file() {
     true
 }
 
-
 @test "Test verilog project runs as expected" {
-    # Compilation alone does not generate the file
     run make -C "${PROJECT_DIR}" vcompile
     assert_success
-    assert_output --partial "V e r i l a t i o n"
+    assert_file_exist "${BUILD_DIR}/verilog/linter/src/top_lint_ok.txt"
+    assert_file_exist "${BUILD_DIR}/verilog/linter/src/counter_lint_ok.txt"
 
-    run make -C "${PROJECT_DIR}" clean
+    run make -C "${PROJECT_DIR}" vfmt
     assert_success
 
-    # Running tidy again should re-print the same message, but without
-    # compiling
     run make -C "${PROJECT_DIR}" vrun
     assert_success
-    #assert_file_exist "${BUILD_DIR}/counter_top/dump.fst"
+    assert_file_exist "${BUILD_DIR}/verilog/waves/tb/top_tb_dump.fst"
 }

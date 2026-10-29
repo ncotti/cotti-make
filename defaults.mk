@@ -128,9 +128,6 @@ TEST_FRAMEWORK_SRC_DIRS ?=
 # Verilog variables
 #------------------------------------------------------------------------------
 
-# The name of the toplevel module/entity in your design.
-V_TOP ?=
-
 # Simulator flags to be included in the compilation (verilator flags)
 V_FLAGS ?=
 
@@ -144,20 +141,32 @@ V_INC_DIRS ?=
 
 # White-space separated list of paths where python testbenches files are.
 # All files ending with ".py" will be listed as testbenches.
+# Testbenches will have as their "DUT" the namesake RTL module, therefore,
+# their names can be "<module>.py" or "<module>_tb.py".
 V_TEST_DIRS ?=
 
-# Name of the folder, inside BUILD_DIR, where verilog build artifacts will be
-# generated
-V_BUILD_DIR ?= verilog
+# The name of the "testbench top".
+# If this variable is set, then only this testbench will be run, and also
+# this testbench's waveforms will be displayed.
+# You may specify the name of the module or the name of the testbench, like
+# "top" or "top_tb".
+V_TB_TOP ?=
 
 #------------------------------------------------------------------------------
-# Extra variables TODO better name?
+# Auxiliary variables (the user knows what is doing)
 #------------------------------------------------------------------------------
 # Name of the folder where all build artifacts will be generated
 BUILD_DIR ?= build
+
+# Name of the folder, where verilog build artifacts will be generated.
+V_BUILD_DIR ?= $(BUILD_DIR)/verilog
 
 # Name of the clang-tidy configuration file
 CLANG_TIDY_CONFIG_FILE ?= $(MAKE_ROOT)/.clang-tidy
 
 # Name of the clang-format configuration file
 CLANG_FORMAT_CONFIG_FILE ?= $(MAKE_ROOT)/.clang-format
+
+# If set to any value, then relevant compilation commands will be printed,
+# and all "quiet" flags in other commands will be removed.
+VERBOSE ?=
