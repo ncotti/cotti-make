@@ -141,6 +141,8 @@ V_INC_DIRS ?=
 
 # White-space separated list of paths where python testbenches files are.
 # All files ending with ".py" will be listed as testbenches.
+# Testbenches will have as their "DUT" the namesake RTL module, therefore,
+# their names can be "<module>.py" or "<module>_tb.py".
 V_TEST_DIRS ?=
 
 # The name of the "testbench top".

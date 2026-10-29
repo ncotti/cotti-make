@@ -60,27 +60,14 @@ teardown_file() {
     true
 }
 
-@test "Compiling with no V_TOP defined should fail" {
+@test "Compiling with empty V_SRC_DIRS should fail" {
     run make -C "${MAKE_DIR}" -f cottimake.mk vcompile
     assert_failure
-    assert_output --partial "[ERROR #025]"
-}
-
-@test "Compiling with empty V_SRC_DIRS should fail" {
-    run make -C "${MAKE_DIR}" -f cottimake.mk vcompile \
-        V_TOP="top"
-    assert_failure
     assert_output --partial "[ERROR #019]"
-
-    run make -C "${MAKE_DIR}" -f cottimake.mk vcompile \
-        V_TOP="top" \
-        V_SRC_DIRS="${src_dir1}"
-    assert_success
 }
 
 @test "Compiling with not existent V_SRC_DIRS should fail" {
     run make -C "${MAKE_DIR}" -f cottimake.mk vcompile \
-        V_TOP="top" \
         V_SRC_DIRS="${src_dir1} ${not_dir1}"
     assert_failure
     assert_output --partial "[ERROR #020]"
@@ -89,7 +76,6 @@ teardown_file() {
 
 @test "Setting a file in V_SRC_DIRS should not be allowed" {
     run make -C "${MAKE_DIR}" -f cottimake.mk vcompile \
-        V_TOP="top" \
         V_SRC_DIRS="${src_dir1} ${src_dir2} ${src_file1} ${src_file2}"
     assert_failure
     assert_output --partial "[ERROR #020]"
@@ -99,7 +85,6 @@ teardown_file() {
 
 @test "Compiling with not existent V_INC_DIRS should fail" {
     run make -C "${MAKE_DIR}" -f cottimake.mk vcompile \
-        V_TOP="top" \
         V_SRC_DIRS="${src_dir1}" \
         V_INC_DIRS="${inc_dir1} ${inc_dir2} ${not_dir1} ${not_dir2}"
     assert_failure
@@ -110,7 +95,6 @@ teardown_file() {
 
 @test "If a source dir does not have any source file, fail" {
     run make -C "${MAKE_DIR}" -f cottimake.mk vcompile \
-        V_TOP="top" \
         V_SRC_DIRS="${empty_dir}"
     assert_failure
     assert_output --partial "[ERROR #013]"
@@ -119,7 +103,6 @@ teardown_file() {
 
 @test "If a header dir does not have any header file, fail" {
     run make -C "${MAKE_DIR}" -f cottimake.mk vcompile \
-        V_TOP="top" \
         V_SRC_DIRS="${src_dir1}" \
         V_INC_DIRS="${empty_dir}"
     assert_failure
@@ -161,9 +144,4 @@ teardown_file() {
     assert_failure
     assert_output --partial "[ERROR #015]"
     assert_output --partial "${empty_dir}"
-}
-
-@test "TODO" {
-    echo "Check the relationship between tb name and module name."
-    false
 }
