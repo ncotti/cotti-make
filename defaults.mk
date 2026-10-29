@@ -167,6 +167,6 @@ CLANG_TIDY_CONFIG_FILE ?= $(MAKE_ROOT)/.clang-tidy
 # Name of the clang-format configuration file
 CLANG_FORMAT_CONFIG_FILE ?= $(MAKE_ROOT)/.clang-format
 
-# If set to any value, then relevant compilation commands will be printed,
+# If set to "1" then relevant compilation commands will be printed,
 # and all "quiet" flags in other commands will be removed.
-VERBOSE ?=
+VERBOSE ?= 0

@@ -14,17 +14,17 @@ COMPILE_COMMANDS := $(BUILD_DIR)/compile_commands.json
 #------------------------------------------------------------------------------
 .PHONY: tidy ## Do static analysis with clang-tidy
 tidy: $(COMPILE_COMMANDS)
-	printf "$(MSG_TIDY)"
-	clang-tidy --verify-config --quiet 1>/dev/null
-	clang-tidy -p $(BUILD_DIR) \
+	@printf "$(MSG_TIDY)"
+	$(Q)clang-tidy --verify-config --quiet 1>/dev/null
+	$(Q)clang-tidy -p $(BUILD_DIR) \
 		--config-file=$(CLANG_TIDY_CONFIG_FILE) \
 		--quiet \
 		$(C_SRCS) $(TEST_SRCS)
 
 .PHONY: fmt ## Code formatter with clang-format
 fmt: $(COMPILE_COMMANDS)
-	printf "$(MSG_FORMAT)"
-	clang-format \
+	@printf "$(MSG_FORMAT)"
+	$(Q)clang-format \
 		--style="file:$(CLANG_FORMAT_CONFIG_FILE)" \
 		-i \
 		--verbose \
@@ -38,5 +38,5 @@ fmt: $(COMPILE_COMMANDS)
 # $(SRCS) or $(HEADERS) as prerequisites.
 # It will only be re-created after a make clean
 $(COMPILE_COMMANDS): | $(BUILD_DIR)
-	bear --output $(COMPILE_COMMANDS) -- \
+	@bear --output $(COMPILE_COMMANDS) -- \
 		$(MAKE) -B --no-print-directory $(OBJS) $(TEST_OBJS) $(TEST_FRAMEWORK_OBJS)

@@ -31,17 +31,17 @@ compile_dynamic_lib: $(LIBSO)
 #------------------------------------------------------------------------------
 # Static library linking
 $(LIBA): $(OBJS)
-	printf "$(MSG_AR)"
-	$(T_AR) rcs $@ $^
-	printf "$(MSG_STATIC_LIB_OK)"
+	@printf "$(MSG_AR)"
+	$(Q)$(T_AR) rcs $@ $^
+	@printf "$(MSG_STATIC_LIB_OK)"
 
 # Dynamic library linking
 $(LIBSO): $(OBJS_PIC) | $(INFO_DIR)
-	printf "$(MSG_LINK)"
-	$(T_LD) -o $@ $^ $(LDFLAGS) $(EXTRA_LDFLAGS) -shared
-	printf "$(MSG_DYNAMIC_LIB_OK)"
+	@printf "$(MSG_LINK)"
+	$(Q)$(T_LD) -o $@ $^ $(LDFLAGS) $(EXTRA_LDFLAGS) -shared
+	@printf "$(MSG_DYNAMIC_LIB_OK)"
 
 # Compiling object files from C sources with PIC (position independent code)
 $(BUILD_DIR)/%.pic.o: %.c $(MISC_DEPS) | $(BUILD_SRC_DIRS)
-	printf "$(MSG_COMPILE_C_FILE)"
-	$(T_CC) $(CFLAGS) $(EXTRA_CFLAGS) -fPIC $(HEADER_FLAGS) -o $@ -c $<
+	@printf "$(MSG_COMPILE_C_FILE)"
+	$(Q)$(T_CC) $(CFLAGS) $(EXTRA_CFLAGS) -fPIC $(HEADER_FLAGS) -o $@ -c $<
