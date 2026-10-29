@@ -36,9 +36,11 @@ endif
 #------------------------------------------------------------------------------
 .PHONY: headers ## Generate symbol table and section headers for all object files.
 headers: $(OBJ_HEADERS)
+	@true
 
 .PHONY: dasm ## Generate disassemble for all object files and elf file.
 dasm: $(DASM_FILES)
+	@true
 
 #------------------------------------------------------------------------------
 # Information targets
