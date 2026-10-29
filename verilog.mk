@@ -115,7 +115,7 @@ $(V_BUILD_DIR)/linter/%_lint_ok.txt: %.sv $(V_SRCS) $(V_HEADERS) $(MISC_DEPS) | 
 	touch "$@"
 
 # The simulation might fail, but execution won't be stopped.
-$(V_BUILD_DIR)/waves/%_dump.fst: %.py
+$(V_BUILD_DIR)/waves/%_dump.fst: %.py $(V_SRCS) $(V_HEADERS) $(MISC_DEPS) | $(V_BUILD_DIR)
 	tb=$$(basename "$<" .py); \
 	top="$${tb%_tb}"; \
 	printf "$(MSG_V_TB) $${tb}\n"; \

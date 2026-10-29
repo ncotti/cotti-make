@@ -7,7 +7,6 @@ module top #(
     input logic clk,
     input logic rstN,
     input logic ena,
-    input logic [ADDR_WIDTH-1:0] start_addr,
     output logic [ADDR_WIDTH-1:0] addr,
     output logic [DATA_WIDTH-1:0] data
 );
@@ -15,13 +14,10 @@ module top #(
 
     timeunit 1ns; timeprecision 1ns;
 
-    logic reset_rising_edge;
+    logic [ADDR_WIDTH-1:0] rom_addr;
 
-    // Detect a rising rising edge in the reset line.
     always_ff @(posedge clk) begin
-        logic prev_rstN;
-        prev_rstN <= rstN;
-        reset_rising_edge <= ~prev_rstN & rstN;
+        addr <= rom_addr;
     end
 
     rom #(
@@ -30,7 +26,7 @@ module top #(
         .ROM_FILE  (RomFilename)
     ) rom_i (
         .clk (clk),
-        .addr(addr),
+        .addr(rom_addr),
         .dout(data)
     );
 
@@ -40,8 +36,8 @@ module top #(
         .clk(clk),
         .rstN(rstN),
         .ena(ena),
-        .load(start_addr),
-        .load_enable(reset_rising_edge),
-        .count(addr)
+        .load('0),
+        .load_enable(1'b0),
+        .count(rom_addr)
     );
 endmodule : top

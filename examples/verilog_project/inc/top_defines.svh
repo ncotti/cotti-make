@@ -6,8 +6,9 @@ package top_defines;
     timeunit 1ns; timeprecision 1ns;
 
     /* verilator lint_off UNUSEDPARAM */
-    localparam string RomFilename = "my_rom.hex";
+    // Path is relative to the Makefile
+    localparam string RomFilename = "tb/rom.hex";
 
-endpackage: top_defines
+endpackage : top_defines
 
-`endif // TOP_H_
+`endif  // TOP_H_
