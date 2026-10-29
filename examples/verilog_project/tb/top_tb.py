@@ -2,6 +2,7 @@ import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge, Timer
 
+
 async def reset(dut):
     c = Clock(dut.clk, 10, "ns")
     c.start()
@@ -12,6 +13,7 @@ async def reset(dut):
     dut.rstN.value = 0
     await RisingEdge(dut.clk)
     dut.rstN.value = 1
+
 
 @cocotb.test
 async def test_read_rom(dut):
@@ -26,7 +28,7 @@ async def test_read_rom(dut):
     await Timer(1, "ns")
 
     expected_value = 0x11
-    for i in range(1,9):
+    for i in range(1, 9):
         await RisingEdge(dut.clk)
         await Timer(1, "ns")
 

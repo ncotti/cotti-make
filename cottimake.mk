@@ -192,6 +192,9 @@ include $(MAKE_ROOT)/lib_targets.mk
 
 include $(MAKE_ROOT)/tidy_targets.mk
 
+# Must be included before verilog.mk, because it defines PYTHON_SRCS
+include $(MAKE_ROOT)/python_targets.mk
+
 include $(MAKE_ROOT)/verilog.mk
 
 # Keep the print target for last
