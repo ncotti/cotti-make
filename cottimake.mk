@@ -10,7 +10,6 @@
 #------------------------------------------------------------------------------
 SHELL=/bin/bash
 .DELETE_ON_ERROR:
-.SILENT:
 .DEFAULT_GOAL := help
 
 # Path to this Makefile, relative to the location from where it was called.
@@ -36,6 +35,13 @@ include $(MAKE_ROOT)/goals.mk
 #------------------------------------------------------------------------------
 # Default values for user variables
 include $(MAKE_ROOT)/defaults.mk
+
+# Verbosity variable
+ifeq ($(VERBOSE),1)
+    Q :=
+else
+    Q := @
+endif
 
 # The following are the result of combining the chosen tools and toolchain
 T_CC		:= $(CROSS_COMPILE)$(CC)
@@ -131,7 +137,7 @@ override LD_LIBRARY_PATH := $(if $(LD_LIBRARY_PATH),$(LIB_DIRS_COLON):$(LD_LIBRA
 #------------------------------------------------------------------------------
 .PHONY: help ## Display this message.
 help:
-	grep -E '^\.PHONY:.*## .*$$' $(MAKE_ROOT)/*.mk $(MAKE_ORIGIN) \
+	@grep -E '^\.PHONY:.*## .*$$' $(MAKE_ROOT)/*.mk $(MAKE_ORIGIN) \
 	| awk 'BEGIN {FS=":|## "}; \
 	       {gsub(/^[ \t]+|[ \t]+$$/, "", $$3); \
 	        printf "$(BOLD_CYAN)%-12s$(NC) %s\n", $$3, $$4}' \
@@ -139,39 +145,42 @@ help:
 
 .PHONY: compile ## Compile source files and generate executable
 compile: $(ELF)
+	@true
 
 .PHONY: bin ## Generate binary file, without ELF headers.
 bin: $(BIN)
+	@true
 
 .PHONY: hex ## Create a text-based hexadecimal memory file, with 32-bit instructions per line.
 hex: $(HEX)
+	@true
 
 .PHONY: clean ## Erase contents of build directory.
 clean:
-	if [ -d "$(BUILD_DIR)" ]; then \
+	@if [ -d "$(BUILD_DIR)" ]; then \
 		rm -Rf $(BUILD_DIR) && \
 		printf "$(MSG_CLEAN_OK)"; \
 	fi
 
 .PHONY: run ## Execute program
 run: $(ELF)
-	printf "$(MSG_RUN)"
-	if [ -n "$(LD_LIBRARY_PATH)" ]; then \
+	@printf "$(MSG_RUN)"
+	@if [ -n "$(LD_LIBRARY_PATH)" ]; then \
 		printf "$(MAGENTA)LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) \\ $(NC) \n"; \
 	fi
-	printf "$(MAGENTA)$(ELF) $(EXEFLAGS)$(NC)\n"
-	LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) $(ELF) $(EXEFLAGS)
+	@printf "$(MAGENTA)$(ELF) $(EXEFLAGS)$(NC)\n"
+	$(Q)LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) $(ELF) $(EXEFLAGS)
 
 .PHONY: debug ## Debug executable file
 debug: $(ELF)
-	if [ -z $(filter -g,$(CFLAGS)) ]; then \
+	@if [ -z $(filter -g,$(CFLAGS)) ]; then \
 		printf "$(MSG_DEBUG_NO_G_FLAG)"; \
 		exit 11; \
 	fi
-	printf "$(MSG_DEBUG)"
-	printf "$(MAGENTA)$(T_GDB) $(GDBFLAGS) $(EXTRA_GDBFLAGS) $(ELF)$(NC)\n"
-	$(T_GDB) $(GDBFLAGS) $(EXTRA_GDBFLAGS) $(ELF)
-	$(MAKE) --no-print-directory kill_sim
+	@printf "$(MSG_DEBUG)"
+	@printf "$(MAGENTA)$(T_GDB) $(GDBFLAGS) $(EXTRA_GDBFLAGS) $(ELF)$(NC)\n"
+	$(Q)$(T_GDB) $(GDBFLAGS) $(EXTRA_GDBFLAGS) $(ELF)
+	@$(MAKE) --no-print-directory kill_sim
 
 include $(MAKE_ROOT)/info_targets.mk
 
@@ -193,38 +202,38 @@ include $(MAKE_ROOT)/print_targets.mk
 #------------------------------------------------------------------------------
 # Main executable linking
 $(ELF): $(OBJS) | $(INFO_DIR)
-	printf "$(MSG_LINK)"
-	$(T_LD) -o $@ $^ $(LDFLAGS) $(EXTRA_LDFLAGS) $(LIB_FLAGS)
-	printf "$(MSG_COMPILE_OK)"
+	@printf "$(MSG_LINK)"
+	$(Q)$(T_LD) -o $@ $^ $(LDFLAGS) $(EXTRA_LDFLAGS) $(LIB_FLAGS)
+	@printf "$(MSG_COMPILE_OK)"
 
 # Compiling object files from C sources
 $(BUILD_DIR)/%.o: %.c $(MISC_DEPS) | $(BUILD_SRC_DIRS)
-	printf "$(MSG_COMPILE_C_FILE)"
-	$(T_CC) $(CFLAGS) $(EXTRA_CFLAGS) $(HEADER_FLAGS) -o $@ -c $<
+	@printf "$(MSG_COMPILE_C_FILE)"
+	$(Q)$(T_CC) $(CFLAGS) $(EXTRA_CFLAGS) $(HEADER_FLAGS) -o $@ -c $<
 
 # Compiling object files from asm sources ending with ".s"
 $(BUILD_DIR)/%_asm.o: %.s $(MISC_DEPS) | $(BUILD_SRC_DIRS)
-	printf "$(MSG_COMPILE_ASM_FILE)"
-	$(T_AS) $(ASFLAGS) $(EXTRA_ASFLAGS) $(HEADER_FLAGS) -o $@ -c $<
+	@printf "$(MSG_COMPILE_ASM_FILE)"
+	$(Q)$(T_AS) $(ASFLAGS) $(EXTRA_ASFLAGS) $(HEADER_FLAGS) -o $@ -c $<
 
 # Compiling object files from asm sources ending with ".S"
 $(BUILD_DIR)/%_asm.o: %.S $(MISC_DEPS) | $(BUILD_SRC_DIRS)
-	printf "$(MSG_COMPILE_ASM_FILE)"
-	$(T_AS) $(ASFLAGS) $(EXTRA_ASFLAGS) $(HEADER_FLAGS) -o $@ -c $<
+	@printf "$(MSG_COMPILE_ASM_FILE)"
+	$(Q)$(T_AS) $(ASFLAGS) $(EXTRA_ASFLAGS) $(HEADER_FLAGS) -o $@ -c $<
 
 # Copy ELF file into BIN file
 $(BIN): $(ELF)
-	printf "$(MSG_BIN)"
-	$(T_OBJCOPY) -O binary $(ELF) $(BIN)
+	@printf "$(MSG_BIN)"
+	$(Q)$(T_OBJCOPY) -O binary $(ELF) $(BIN)
 
 # Copy ELF file into HEX file
 $(HEX): $(BIN)
-	printf "$(MSG_HEX)"
-	od -An -v -tx4 -w4 $(BIN) | tr -d ' ' | tr '[:lower:]' '[:upper:]' > $(HEX)
+	@printf "$(MSG_HEX)"
+	$(Q)od -An -v -tx4 -w4 $(BIN) | tr -d ' ' | tr '[:lower:]' '[:upper:]' > $(HEX)
 
 # Folders
 $(BUILD_SRC_DIRS) $(BUILD_DIR):
-	mkdir -p $@
+	@mkdir -p $@
 
 # Empty rule for miscellaneous dependencies
 $(MISC_DEPS):

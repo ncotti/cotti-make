@@ -29,7 +29,7 @@ endif
 #------------------------------------------------------------------------------
 .PHONY: sim ## Execute program in simulation environment
 sim: $(ELF) kill_sim
-	if [ -n "$(TERMINAL)" ]; then \
+	@if [ -n "$(TERMINAL)" ]; then \
 		printf "$(MSG_SIM_TERMINAL)"; \
 		printf "$(MAGENTA)$(SIM) $(SIMFLAGS) $(EXTRA_SIMFLAGS)$(NC)\n"; \
 		$(TERMINAL) -- bash -c "\
@@ -45,7 +45,7 @@ sim: $(ELF) kill_sim
 
 .PHONY: kill_sim ## Kills a running simulator instance
 kill_sim:
-	if [ -f "$(SIM_PID_FILE)" ]; then \
+	@if [ -f "$(SIM_PID_FILE)" ]; then \
 		kill "$$(cat $(SIM_PID_FILE))" &>/dev/null; \
 		rm -f $(SIM_PID_FILE); \
 	fi

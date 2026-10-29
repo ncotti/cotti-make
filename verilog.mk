@@ -61,7 +61,7 @@ V_INC_FLAGS := $(addprefix -I,$(V_INC_DIRS))
 # Arguments passes to the compiler and simulator directly
 V_FLAGS += -Wall -Wpedantic -Wwarn-lint -Wwarn-style \
 	--MMD --MP -sv \
-	--quiet
+	$(if $(Q),--quiet,)
 
 # Dump a VCD file for waveform visualization
 V_FLAGS += --trace --trace-fst --trace-structs
@@ -80,46 +80,48 @@ V_DUMP_FILE := dump.fst
 #------------------------------------------------------------------------------
 .PHONY: vrun ## Runs cocotb testbenches.
 vrun: vcompile $(V_WAVEFORMS)
+	@true
 
 .PHONY: vcompile ## Lints and compiles the RTL design.
 vcompile: $(V_LINT_FILES)
-	$(T_V_LINT) --check_syntax --lint_fatal --parse_fatal $(V_SRCS) $(V_HEADERS)
+	@true
 
 .PHONY: vdebug ## Opens the RTL testbench waveform
 vdebug: vcompile $(V_WAVEFORMS)
-	RUST_LOG=warn surfer "$(lastword $(^))"
+	$(if $(Q),$(Q)RUST_LOG=warn,) surfer "$(lastword $(^))"
 
 .PHONY: vfmt ## Format SystemVerilog files
 vfmt:
-	$(T_V_FMT) \
+	$(Q)$(T_V_FMT) \
 	--column_limit=80 --indentation_spaces=4 \
 	--inplace $(V_SRCS) $(V_HEADERS)
-	# TODO format testbenches
+	@# TODO format testbenches
 
 #------------------------------------------------------------------------------
 # Auxiliary targets
 #------------------------------------------------------------------------------
 $(V_BUILD_DIR):
-	mkdir -p $@
+	@mkdir -p $@
 
 $(V_BUILD_DIR)/linter/%_lint_ok.txt: %.sv $(V_SRCS) $(V_HEADERS) $(MISC_DEPS) | $(V_BUILD_DIR)
-	mkdir -p $(dir $@)
-	top=$$(basename "$<" .sv); \
+	@mkdir -p $(dir $@)
+	@printf "$(MSG_COMPILE_V_FILE)  $<\n"
+	$(Q)$(T_V_LINT) --check_syntax --lint_fatal --parse_fatal $(V_SRCS) $(V_HEADERS)
+	$(Q)top=$$(basename "$<" .sv); \
 	top=$$(basename "$${top}" .v); \
-	printf "$(MSG_COMPILE_V_FILE)  $<\n"; \
 	$(T_V_COMPILER) $(V_FLAGS) $(V_INC_FLAGS) \
 		-Mdir "$$(dirname $@)" \
 		--top "$${top}" \
 		--lint-only $(V_SRCS)
 
-	touch "$@"
+	$(Q)touch "$@"
 
 # The simulation might fail, but execution won't be stopped.
 $(V_BUILD_DIR)/waves/%_dump.fst: %.py $(V_SRCS) $(V_HEADERS) $(MISC_DEPS) | $(V_BUILD_DIR)
-	tb=$$(basename "$<" .py); \
+	@mkdir -p "$$(dirname $@)"
+	@printf "$(MSG_V_TB) $<\n"
+	$(Q)tb=$$(basename "$<" .py); \
 	top="$${tb%_tb}"; \
-	printf "$(MSG_V_TB) $<\n"; \
-	mkdir -p "$$(dirname $@)"; \
 	$(MAKE) --no-print-directory --quiet \
 		-f $(shell cocotb-config --makefiles)/Makefile.sim sim \
 		SIM=verilator \
@@ -133,6 +135,7 @@ $(V_BUILD_DIR)/waves/%_dump.fst: %.py $(V_SRCS) $(V_HEADERS) $(MISC_DEPS) | $(V_
 		COCOTB_TEST_MODULES="$${tb}" \
 		PYTHONPATH="$(V_TEST_DIRS_COLON)" \
 		COCOTB_RESULTS_FILE="$(V_BUILD_DIR)/$${top}/results.xml" || true
-	if [ -f $(V_DUMP_FILE) ]; then \
+
+	@if [ -f $(V_DUMP_FILE) ]; then \
 		mv "$(V_DUMP_FILE)" "$@"; \
 	fi;

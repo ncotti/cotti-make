@@ -19,4 +19,4 @@ include ../../cottimake.mk
 
 .PHONY: custom_target ## Custom target
 custom_target:
-	printf "Hi\n"
+	@printf "Hi\n"
