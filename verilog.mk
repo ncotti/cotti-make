@@ -94,7 +94,8 @@ vdebug: vcompile $(V_WAVEFORMS)
 vfmt: pfmt
 	$(Q)$(T_V_FMT) \
 	--column_limit=80 --indentation_spaces=4 \
-	--inplace $(V_SRCS) $(V_HEADERS)
+	$(if $(filter 1,$(FMT_CHECK)),--verify --inplace,--inplace) \
+	$(V_SRCS) $(V_HEADERS)
 
 #------------------------------------------------------------------------------
 # Auxiliary targets

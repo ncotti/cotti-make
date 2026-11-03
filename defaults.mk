@@ -181,3 +181,7 @@ PYTHON_FORMAT_CONFIG_FILE ?= $(MAKE_ROOT)/ruff.toml
 # If set to "1" then relevant compilation commands will be printed,
 # and all "quiet" flags in other commands will be removed.
 VERBOSE ?= 0
+
+# If set to "1" then the formatters will not change the files, only report
+# a non-zero value if any file requires changing
+FMT_CHECK ?= 0

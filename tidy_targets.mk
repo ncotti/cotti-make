@@ -26,7 +26,7 @@ fmt: $(COMPILE_COMMANDS)
 	@printf "$(MSG_FORMAT)"
 	$(Q)clang-format \
 		--style="file:$(CLANG_FORMAT_CONFIG_FILE)" \
-		-i \
+		$(if $(filter 1,$(FMT_CHECK)),--dry-run --Werror,-i) \
 		--verbose \
 		$(C_SRCS) $(C_HEADERS) $(TEST_SRCS)
 
