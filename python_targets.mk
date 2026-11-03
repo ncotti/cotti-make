@@ -20,4 +20,6 @@ plint: $(PYTHON_SRCS)
 
 .PHONY: pfmt ## Format Python files
 pfmt: $(PYTHON_SRCS)
-	$(Q)ruff -q --config "$(PYTHON_FORMAT_CONFIG_FILE)" format $^
+	$(Q)ruff -q --config "$(PYTHON_FORMAT_CONFIG_FILE)" format \
+	$(if $(filter 1,$(FMT_CHECK)),--check,) \
+	$^
