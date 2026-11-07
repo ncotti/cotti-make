@@ -36,8 +36,13 @@ endif # V_TB_TOP
 # Waveform files.
 # A waveform is generated for each test, mimicking its path inside the
 # "$(V_BUILD_DIR)/waves" folder.
-V_WAVEFORMS := $(patsubst %.py, %_dump.fst, $(V_TESTS))
+V_WAVEFORMS := $(patsubst %.py,%_dump.fst,$(V_TESTS))
 V_WAVEFORMS := $(addprefix $(V_BUILD_DIR)/waves/,$(V_WAVEFORMS))
+
+# Whenever Surfer is launched, this file will store two values:
+# PID
+# FILE_BEING_READ
+V_SURFER_PID_FILE := $(V_BUILD_DIR)/waves/surfer_pid.txt
 
 # Lint files
 # This files are created as a "proof of work", showing that the given module
@@ -88,7 +93,28 @@ vcompile: $(V_LINT_FILES)
 
 .PHONY: vdebug ## Opens the RTL testbench waveform
 vdebug: vcompile $(V_WAVEFORMS)
-	$(if $(Q),$(Q)RUST_LOG=warn,) surfer "$(lastword $(^))"
+	@surfer_pid=""; \
+	surfer_wave=""; \
+	surfer_new="1"; \
+	if [ -f "$(V_SURFER_PID_FILE)" ]; then \
+		{ \
+			read -r surfer_pid; \
+			read -r surfer_wave; \
+		} < "$(V_SURFER_PID_FILE)"; \
+		ps --pid "$${surfer_pid}" &>/dev/null; \
+		if [ $$? == 0 ]; then \
+			if [ "$(V_WAVEFORMS)" != "$${surfer_wave}" ]; then \
+				kill "$${surfer_pid}" &>/dev/null || true; \
+			else \
+				surfer_new=""; \
+				printf "$(MAGENTA)Surfer already open.\nReload waveform from GUI to see changes.$(NC)\n"; \
+			fi; \
+		fi; \
+	fi; \
+	if [ -n "$${surfer_new}" ]; then \
+		$(if $(Q),RUST_LOG=warn,) surfer "$(lastword $(^))" & echo $$! > $(V_SURFER_PID_FILE); \
+		echo $(V_WAVEFORMS) >> $(V_SURFER_PID_FILE); \
+	fi
 
 .PHONY: vfmt ## Format SystemVerilog files
 vfmt: pfmt
