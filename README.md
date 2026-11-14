@@ -133,6 +133,36 @@ Verilog commands all start with the letter `v`.
 You may also define the variable `V_TB_TOP` to run only a single testbench, or to load
 the generated waveform with `make vdebug`.
 
+## Verilog CocoTB parameters
+
+When simulating a DUT, you may want to tests different parameter combinations.
+
+Assume that you have a DUT as follows, with a variable:
+
+```sv
+module my_module #(
+    parameter int PARAM_1 = 32
+    parameter int PARAM_2 = 16
+) (
+    input logic [31:0] a,
+    input logic [31:0] b,
+    output logic [31:0] c
+);
+```
+
+If, in your Python testbench, it is detected a line starting with `##?`, then
+a simulation will be run overriding the default parameter values as follows:
+
+```py
+import cocotb
+
+##? PARAM_1=16 PARAM_2=8
+
+@cocotb.test
+async def test_something(dut):
+    assert dut.PARAM_1.value == 16
+```
+
 ## Extending the build system
 
 Need to do something custom that is not support with the default targets? Worry not! You can define new Make targets as you would normally do in any Makefile.

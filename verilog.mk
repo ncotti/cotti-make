@@ -131,7 +131,7 @@ $(V_BUILD_DIR):
 
 $(V_BUILD_DIR)/linter/%_lint_ok.txt: %.sv $(V_SRCS) $(V_HEADERS) $(MISC_DEPS) | $(V_BUILD_DIR)
 	@mkdir -p $(dir $@)
-	@printf "$(MSG_COMPILE_V_FILE)  $<\n"
+	@printf "$(MSG_COMPILE_V_FILE) $<\n"
 	$(Q)$(T_V_LINT) --check_syntax --lint_fatal --parse_fatal $(V_SRCS) $(V_HEADERS)
 	$(Q)top=$$(basename "$<" .sv); \
 	top=$$(basename "$${top}" .v); \
@@ -145,22 +145,35 @@ $(V_BUILD_DIR)/linter/%_lint_ok.txt: %.sv $(V_SRCS) $(V_HEADERS) $(MISC_DEPS) | 
 # The simulation might fail, but execution won't be stopped.
 $(V_BUILD_DIR)/waves/%_dump.fst: %.py $(V_SRCS) $(V_HEADERS) $(MISC_DEPS) | $(V_BUILD_DIR)
 	@mkdir -p "$$(dirname $@)"
-	@printf "$(MSG_V_TB) $<\n"
 	$(Q)tb=$$(basename "$<" .py); \
 	top="$${tb%_tb}"; \
-	$(MAKE) --no-print-directory --quiet \
-		-f $(shell cocotb-config --makefiles)/Makefile.sim sim \
-		SIM=verilator \
-		WAVES=1 \
-		COCOTB_TOPLEVEL="$${top}" \
-		VERILOG_SOURCES="$(V_SRCS) $(V_HEADERS)" \
-		VERILOG_INCLUDE_DIRS="$(V_INC_DIRS)" \
-		EXTRA_ARGS="$(V_FLAGS) --top $${top}" \
-		TOPLEVEL_LANG=verilog \
-		SIM_BUILD="$(V_BUILD_DIR)/$${top}/" \
-		COCOTB_TEST_MODULES="$${tb}" \
-		PYTHONPATH="$(V_TEST_DIRS_COLON)" \
-		COCOTB_RESULTS_FILE="$(V_BUILD_DIR)/$${top}/results.xml" || true
+	sv_params=$$(grep '^##?' $< | sed 's/^##?[[:space:]]*//'); \
+	while IFS= read -r params || [[ -n "$${params}" ]]; do \
+		printf "$(MSG_V_TB) $< $${params}\n"; \
+		while IFS= read -r line || [[ -n "$${line}" ]]; do \
+			g_params="-G$${line// / -G}"; \
+		done <<< "$${params}"; \
+		if [ -n "$${params}" ]; then \
+			sv_file=$$(printf '%s' "$${params}" | sed -E 's/[[:space:]]+/__/g'); \
+			sv_file=$$(printf '%s__%s' "$${top}" "$${sv_file}"); \
+		else \
+			sv_file=$${top}; \
+		fi; \
+		sv_file=$${sv_file//=/-}; \
+		$(MAKE) --no-print-directory --quiet \
+			-f $(shell cocotb-config --makefiles)/Makefile.sim sim \
+			SIM=verilator \
+			WAVES=1 \
+			COCOTB_TOPLEVEL="$${top}" \
+			VERILOG_SOURCES="$(V_SRCS) $(V_HEADERS)" \
+			VERILOG_INCLUDE_DIRS="$(V_INC_DIRS)" \
+			EXTRA_ARGS="$(V_FLAGS) --top $${top} $${g_params}"\
+			TOPLEVEL_LANG=verilog \
+			SIM_BUILD="$(V_BUILD_DIR)/$${sv_file}/" \
+			COCOTB_TEST_MODULES="$${tb}" \
+			PYTHONPATH="$(V_TEST_DIRS_COLON)" \
+			COCOTB_RESULTS_FILE="$(V_BUILD_DIR)/$${sv_file}/results.xml" || true; \
+	done <<< "$${sv_params}"
 
 	@if [ -f $(V_DUMP_FILE) ]; then \
 		mv "$(V_DUMP_FILE)" "$@"; \
