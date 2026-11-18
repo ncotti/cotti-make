@@ -9,7 +9,7 @@
 #------------------------------------------------------------------------------
 
 # Python source files
-PYTHON_SRCS := $(foreach dir, $(PYTHON_SRC_DIRS) $(V_TEST_DIRS),$(wildcard $(dir)/*.py))
+PYTHON_SRCS := $(foreach dir,$(PYTHON_SRC_DIRS),$(wildcard $(dir)/*.py))
 
 #------------------------------------------------------------------------------
 # User targets
