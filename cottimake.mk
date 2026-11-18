@@ -156,7 +156,7 @@ hex: $(HEX)
 	@true
 
 .PHONY: clean ## Erase contents of build directory.
-clean vclean:
+clean:
 	@if [ -d "$(BUILD_DIR)" ]; then \
 		rm -Rf $(BUILD_DIR) && \
 		printf "$(MSG_CLEAN_OK)"; \

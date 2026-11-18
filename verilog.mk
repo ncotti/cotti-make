@@ -131,6 +131,13 @@ vfmt: pfmt
 	$(if $(filter 1,$(FMT_CHECK)),--verify --inplace,--inplace) \
 	$(V_SRCS) $(V_HEADERS)
 
+.PHONY: vclean ## Same as clean
+vclean: clean
+	@if [ -d "$(BUILD_DIR)" ]; then \
+		rm -Rf $(BUILD_DIR) && \
+		printf "$(MSG_CLEAN_OK)"; \
+	fi
+
 #------------------------------------------------------------------------------
 # Auxiliary targets
 #------------------------------------------------------------------------------
