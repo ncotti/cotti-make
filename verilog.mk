@@ -80,12 +80,20 @@ V_FLAGS += --trace --trace-fst --trace-structs
 # where it was invoked.
 V_DUMP_FILE := dump.fst
 
+V_FAILED_TB_FILE := $(V_BUILD_DIR)/failed_tb.txt
+
 #------------------------------------------------------------------------------
 # User targets
 #------------------------------------------------------------------------------
 .PHONY: vrun ## Runs cocotb testbenches.
-vrun: vcompile $(V_WAVEFORMS)
-	@true
+vrun: vcompile $(V_FAILED_TB_FILE) $(V_WAVEFORMS)
+	@if [ -f "$(V_FAILED_TB_FILE)" ]; then \
+		echo $${sv_failed}; \
+		printf "$(RED)The following testbenches failed:\n$(NC)"; \
+		while IFS= read -r line; do \
+			printf "$(RED)  * $${line}$(NC)\n"; \
+		done < "$(V_FAILED_TB_FILE)"; \
+	fi
 
 .PHONY: vcompile ## Lints and compiles the RTL design.
 vcompile: $(V_LINT_FILES)
@@ -123,11 +131,23 @@ vfmt: pfmt
 	$(if $(filter 1,$(FMT_CHECK)),--verify --inplace,--inplace) \
 	$(V_SRCS) $(V_HEADERS)
 
+.PHONY: vclean ## Same as clean
+vclean: clean
+	@if [ -d "$(BUILD_DIR)" ]; then \
+		rm -Rf $(BUILD_DIR) && \
+		printf "$(MSG_CLEAN_OK)"; \
+	fi
+
 #------------------------------------------------------------------------------
 # Auxiliary targets
 #------------------------------------------------------------------------------
 $(V_BUILD_DIR):
 	@mkdir -p $@
+
+# This file should always be deleted before starting a run.
+.PHONY: $(V_FAILED_TB_FILE)
+$(V_FAILED_TB_FILE):
+	@rm -rf "$(V_FAILED_TB_FILE)"
 
 $(V_BUILD_DIR)/linter/%_lint_ok.txt: %.sv $(V_SRCS) $(V_HEADERS) $(MISC_DEPS) | $(V_BUILD_DIR)
 	@mkdir -p $(dir $@)
@@ -172,9 +192,10 @@ $(V_BUILD_DIR)/waves/%_dump.fst: %.py $(V_SRCS) $(V_HEADERS) $(MISC_DEPS) | $(V_
 			SIM_BUILD="$(V_BUILD_DIR)/$${sv_file}/" \
 			COCOTB_TEST_MODULES="$${tb}" \
 			PYTHONPATH="$(V_TEST_DIRS_COLON)" \
-			COCOTB_RESULTS_FILE="$(V_BUILD_DIR)/$${sv_file}/results.xml" || true; \
+			COCOTB_RESULTS_FILE="$(V_BUILD_DIR)/$${sv_file}/results.xml" || \
+			echo "$${sv_file}" >> "$(V_FAILED_TB_FILE)"; \
 	done <<< "$${sv_params}"
 
 	@if [ -f $(V_DUMP_FILE) ]; then \
 		mv "$(V_DUMP_FILE)" "$@"; \
-	fi;
+	fi
