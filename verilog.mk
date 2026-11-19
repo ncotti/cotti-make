@@ -127,7 +127,7 @@ vdebug: vcompile $(V_WAVEFORMS)
 .PHONY: vfmt ## Format SystemVerilog files
 vfmt: pfmt
 	$(Q)$(T_V_FMT) \
-	--column_limit=80 --indentation_spaces=4 \
+	--column_limit=100 --indentation_spaces=4 \
 	$(if $(filter 1,$(FMT_CHECK)),--verify --inplace,--inplace) \
 	$(V_SRCS) $(V_HEADERS)
 
@@ -173,9 +173,11 @@ $(V_BUILD_DIR)/waves/%_dump.fst: %.py $(V_SRCS) $(V_HEADERS) $(MISC_DEPS) | $(V_
 		while IFS= read -r line || [[ -n "$${line}" ]]; do \
 			g_params="-G$${line// / -G}"; \
 		done <<< "$${params}"; \
+		g_params="$${g_params//\"/\\\"}"; \
 		if [ -n "$${params}" ]; then \
 			sv_file=$$(printf '%s' "$${params}" | sed -E 's/[[:space:]]+/__/g'); \
 			sv_file=$$(printf '%s__%s' "$${top}" "$${sv_file}"); \
+			sv_file="$${sv_file//[\"\\]/}"; \
 		else \
 			sv_file=$${top}; \
 		fi; \
