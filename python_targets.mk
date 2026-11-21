@@ -16,10 +16,14 @@ PYTHON_SRCS := $(foreach dir,$(PYTHON_SRC_DIRS),$(wildcard $(dir)/*.py))
 #------------------------------------------------------------------------------
 .PHONY: plint ## Lint Python files
 plint: $(PYTHON_SRCS)
-	$(Q)ruff -q --config "$(PYTHON_FORMAT_CONFIG_FILE)" check $^
+	$(Q)if [ -n "$^" ]; then \
+		ruff -q --config "$(PYTHON_FORMAT_CONFIG_FILE)" check $^; \
+	fi
 
 .PHONY: pfmt ## Format Python files
-pfmt: $(PYTHON_SRCS)
-	$(Q)ruff -q --config "$(PYTHON_FORMAT_CONFIG_FILE)" format \
-	$(if $(filter 1,$(FMT_CHECK)),--check,) \
-	$^
+pfmt: $(PYTHON_SRCS) $(V_TESTS)
+	$(Q)if [ -n "$^" ]; then \
+		ruff -q --config "$(PYTHON_FORMAT_CONFIG_FILE)" format \
+		$(if $(filter 1,$(FMT_CHECK)),--check,) \
+		$^; \
+	fi
