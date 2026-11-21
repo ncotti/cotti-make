@@ -158,6 +158,7 @@ import cocotb
 
 ##? PARAM_1=16 PARAM_2=8
 
+
 @cocotb.test
 async def test_something(dut):
     assert dut.PARAM_1.value == 16
