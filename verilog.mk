@@ -152,8 +152,11 @@ $(V_FAILED_TB_FILE):
 
 $(V_BUILD_DIR)/linter/%_lint_ok.txt: %.sv $(V_SRCS) $(V_HEADERS) $(MISC_DEPS) | $(V_BUILD_DIR)
 	@mkdir -p $(dir $@)
-	@printf "$(MSG_COMPILE_V_FILE) $<\n"
-	$(Q)$(T_V_LINT) --check_syntax --lint_fatal --parse_fatal $(V_SRCS) $(V_HEADERS)
+	@printf "$(MSG_COMPILE_V_FILE)  $<\n"
+	$(Q)$(T_V_LINT) \
+		--check_syntax --lint_fatal --parse_fatal \
+		--rules typedef-structs-unions=allow_anonymous_nested:true \
+		$(V_SRCS) $(V_HEADERS)
 	$(Q)top=$$(basename "$<" .sv); \
 	top=$$(basename "$${top}" .v); \
 	$(T_V_COMPILER) $(V_FLAGS) $(V_INC_FLAGS) \
