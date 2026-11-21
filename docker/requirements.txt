@@ -1,4 +1,4 @@
 cocotb~=2.1
 ruff
-cotti_uvm
+cotti_uvm==0.0.8
 pyuvm>=5.0.0

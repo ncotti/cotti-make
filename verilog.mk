@@ -93,6 +93,7 @@ vrun: vcompile $(V_FAILED_TB_FILE) $(V_WAVEFORMS)
 		while IFS= read -r line; do \
 			printf "$(RED)  * $${line}$(NC)\n"; \
 		done < "$(V_FAILED_TB_FILE)"; \
+		exit 1; \
 	fi
 
 .PHONY: vcompile ## Lints and compiles the RTL design.
